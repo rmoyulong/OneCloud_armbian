@@ -14,9 +14,6 @@ on:
         - current
         - edge
 
-env:
-  env_tag_name: 玩客云_armbain_$(TZ=UTC-8 date +"%y.%m.%d_%H.%M.%S")
-  
 #CI权限
 permissions: write-all
   
@@ -77,7 +74,13 @@ jobs:
     
       - name: 下载armbian Git
         run: |
-           git clone --depth=1 --branch=main https://github.com/armbian/build build 
+           git clone --depth=1 --branch=main https://github.com/armbian/build build
+           
+           export CORE_DATE=$(TZ=UTC-8 date +"%y.%m.%d")
+           echo "CORE_DATE=$CORE_DATE" >> $GITHUB_ENV
+           ok_name="Onecloud_Armbain"
+           show_tag_name=$ok_name_${{env.CORE_DATE}}
+           echo "show_tag_name=$show_tag_name" >> $GITHUB_ENV           
 
       - name: 编译
         run: |
