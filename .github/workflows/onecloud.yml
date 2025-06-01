@@ -76,7 +76,7 @@ jobs:
         run: |
            git clone --depth=1 --branch=main https://github.com/armbian/build build
            
-           DATE1=$(date "+%Y-%m-%d")"
+           DATE1=$(date "+%Y-%m-%d")
            tag_name1="玩客云简化版： "
            show_tag_name=${tag_name1}${DATE1}
            echo "show_tag_name=$show_tag_name" >> $GITHUB_ENV
