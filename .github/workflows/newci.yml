@@ -78,6 +78,10 @@ jobs:
       - name: 下载最新armbian库
         run: |
            git clone --depth=1 --branch=main https://github.com/armbian/build build
+           
+           cc_time="$(TZ='Asia/Shanghai' date +'%Y-%m-%d')"
+           show_tag_name="玩客云最新版： {{ $cc_time }}"
+           echo "show_tag_name=$show_tag_name" >> $GITHUB_ENV
 
       - name: 编译
         run: |
