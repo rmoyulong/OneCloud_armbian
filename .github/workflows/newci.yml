@@ -76,8 +76,9 @@ jobs:
         run: |
            git clone --depth=1 --branch=main https://github.com/armbian/build build
            
-           echo "DATE=$(date "+%Y-%m-%d")" >> $GITHUB_ENV
-           show_tag_name="玩客云最新版： ${{ env.DATE }}"
+           DATE1=$(date "+%Y-%m-%d")"
+           tag_name1="玩客云最新版： "
+           show_tag_name=${tag_name1}${DATE1}
            echo "show_tag_name=$show_tag_name" >> $GITHUB_ENV
            echo ${{ env.show_tag_name }}
 
@@ -183,7 +184,7 @@ jobs:
       - name: 上传编译好的成品
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: "玩客云简化版 ${{env.show_tag_name}}"
+          tag_name: "${{ env.show_tag_name }}"
           append_body: true
           body_path: Release.md
           files: |
