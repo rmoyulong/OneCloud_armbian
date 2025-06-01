@@ -180,6 +180,16 @@ jobs:
           cat <<EOF | sed -E 's/^  //' | tee Release.md
             $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
           EOF
+
+      - name: 提取版本号
+        run: |  
+          # 提取版本号
+          # latest_image=$(ls ${{ github.workspace }}/build/output/images/Armbian-unofficial_*.img.xz | grep -oE 'Armbian-unofficial_[0-9.]+_.*' | sort -V | tail -n 1) 
+          latest_image=$(ls ${{ github.workspace }}/build/output/images/Armbian-unofficial_*.img.xz | sort -V | tail -n 1)
+          version=$(echo "$latest_image" | cut -d'_' -f2)  
+  
+          # 将版本号设置为环境变量  
+          echo "VERSION=$version" >> $GITHUB_ENV
           
       - name: 生成标签，上传固件
         uses: ncipollo/release-action@main
@@ -192,7 +202,7 @@ jobs:
             ====================🧊固件信息🧊=======================
             ➦ 💻 固件源码：https://github.com/armbian/build
             ➦ 💝 源码分支：${{ github.event.inputs.BRANCH_TYPE }}
-            ➦ 🚀 内核版本：${{ env.KERNEL }}
+            ➦ 🚀 编译版本：${{ env.version }}
             ➦ 🌐 默认用户：root
             ➦ 🔑 默认密码：1234
                         
