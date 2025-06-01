@@ -14,16 +14,6 @@ on:
         - current
         - edge
 
-      IMAGE_TYPE:
-        description: 'images类型'     
-        required: false
-        default: 'minimal' 
-        type: choice
-        options:
-        - minimal
-        - cli
-        - desktop
-        
 env:
   env_tag_name: 玩客云_armbain_$(TZ=UTC-8 date +"%y.%m.%d_%H.%M.%S")
   
@@ -37,6 +27,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        #IMAGE_TYPE: [minimal, cli, desktop]
+        IMAGE_TYPE: [minimal, cli]
         RELEASE_type:
           # - focal # Ubuntu 20.04 LTS
           # - jammy # Ubuntu 22.04 LTS
@@ -99,8 +91,8 @@ jobs:
               BRANCH=${{ github.event.inputs.BRANCH_TYPE }} \
               RELEASE=${{ matrix.RELEASE_type }} \
               KERNEL_CONFIGURE=no \
-              BUILD_MINIMAL=${{ github.event.inputs.IMAGE_TYPE == 'minimal' && 'yes' || 'no' }} \
-              BUILD_DESKTOP=${{ github.event.inputs.IMAGE_TYPE == 'desktop' && 'yes' || 'no' }} \
+              BUILD_MINIMAL=${{ matrix.IMAGE_TYPE == 'minimal' && 'yes' || 'no' }} \
+              BUILD_DESKTOP=${{ matrix.IMAGE_TYPE == 'desktop' && 'yes' || 'no' }} \
               DESKTOP_ENVIRONMENT=${{ github.event.inputs.DESKTOP_ENVIRONMENT }} \
               DESKTOP_ENVIRONMENT_CONFIG_NAME=${{ github.event.inputs.DESKTOP_ENVIRONMENT_CONFIG_NAME }} \
               DESKTOP_APPGROUPS_SELECTED=${{ github.event.inputs.DESKTOP_APPGROUPS_SELECTED }} \
