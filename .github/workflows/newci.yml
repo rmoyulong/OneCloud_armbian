@@ -96,8 +96,8 @@ jobs:
                   KERNEL_CONFIGURE=no \
                   BUILD_MINIMAL=${{ matrix.IMAGE_TYPE == 'minimal' && 'yes' || 'no' }} \
                   BUILD_DESKTOP=${{ matrix.IMAGE_TYPE == 'desktop' && 'yes' || 'no' }} \
-                  DESKTOP_ENVIRONMENT=xfce \
-                  DESKTOP_ENVIRONMENT_CONFIG_NAME=config_base \
+                  DESKTOP_ENVIRONMENT="xfce" \
+                  DESKTOP_ENVIRONMENT_CONFIG_NAME="config_base" \
                   DESKTOP_APPGROUPS_SELECTED="" \
                   EXPERT=yes \
                   SKIP_EXTERNAL_TOOLCHAINS=yes \
