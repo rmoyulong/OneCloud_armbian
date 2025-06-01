@@ -15,7 +15,7 @@ on:
         - edge
 
 env:
-  show_tag_name: $(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')
+  show_tag_name: "$(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M:%S')"
 
 #CI权限
 permissions: write-all
@@ -178,10 +178,10 @@ jobs:
             $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
           EOF
 
-      - name: 上传成品版本
+      - name: 上传编译好的成品
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: 玩客云最新版_${{env.show_tag_name}}
+          tag_name: "玩客云简化版 ${{env.show_tag_name}}"
           append_body: true
           body_path: Release.md
           files: |
