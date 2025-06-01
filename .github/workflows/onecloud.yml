@@ -183,7 +183,7 @@ jobs:
 
       - name: 获得固件信息
         run: |
-          cd build/output/images/*
+          cd build/output/images
           kword=$(cat *.manifest | grep ^kernel | cut -d- -f2 | tr -d ' ')
           KERNEL=${kword%~*}
           echo "KERNEL=$KERNEL" >> $GITHUB_ENV
