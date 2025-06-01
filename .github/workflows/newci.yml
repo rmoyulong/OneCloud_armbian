@@ -14,9 +14,6 @@ on:
         - current
         - edge
 
-env:
-  show_tag_name: "$(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M:%S')"
-
 #CI权限
 permissions: write-all
   
@@ -79,9 +76,10 @@ jobs:
         run: |
            git clone --depth=1 --branch=main https://github.com/armbian/build build
            
-           cc_time="$(TZ='Asia/Shanghai' date +'%Y-%m-%d')"
-           show_tag_name="玩客云最新版： {{ $cc_time }}"
+           echo "DATE=$(date "+%Y-%m-%d)" >> $GITHUB_ENV
+           show_tag_name="玩客云最新版： ${{ env.DATE }}"
            echo "show_tag_name=$show_tag_name" >> $GITHUB_ENV
+           echo ${{ env.show_tag_name }}
 
       - name: 编译
         run: |
