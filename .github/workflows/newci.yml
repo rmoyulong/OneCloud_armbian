@@ -70,7 +70,7 @@ jobs:
         
     - name: 检查项目
       uses: actions/checkout@main
- 
+      
     - name: 检查分配的服务器性能
       run: |
         echo "警告⚠"
