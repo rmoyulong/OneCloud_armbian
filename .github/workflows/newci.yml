@@ -164,7 +164,7 @@ jobs:
       - name: 上传成品版本
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.env_tag_name }}
+          tag_name: ${{ env.show_tag_name }}
           append_body: true
           body_path: Release.md
           files: |
