@@ -22,7 +22,7 @@ permissions: write-all
   
 jobs:
   build_armbian_firmware:
-    name:  ${{ github.event.inputs.BRANCH_TYPE }}分支编译
+    name:  编译-${{ github.event.inputs.BRANCH_TYPE }}_${{ matrix.IMAGE_TYPE }}_${{ matrix.RELEASE_type }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
