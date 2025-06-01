@@ -76,11 +76,13 @@ jobs:
         run: |
            git clone --depth=1 --branch=main https://github.com/armbian/build build
            
-           DATE1=$(date "+%Y-%m-%d")
-           tag_name1="玩客云最新版： "
-           show_tag_name=${tag_name1}${DATE1}
-           echo "show_tag_name=$show_tag_name" >> $GITHUB_ENV
-           echo ${{ env.show_tag_name }}
+           TIME=$(date "+%Y-%m-%d %H:%M:%S")"
+           TAG="玩客云最新版-$(date "+%Y-%m-%d %H:%M:%S")""
+           cat <<EOF | sed -E 's/^  //' >>$GITHUB_ENV
+             c_time=$TIME
+             show_tag_name=$TAG
+           EOF
+           echo "env=$(cat $GITHUB_ENV | base64 -w 0)" >>$GITHUB_OUTPUT
 
       - name: 编译
         run: |
