@@ -189,5 +189,5 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{env.show_tag_name}}
           artifacts: build/output/images/*
-          body: Release.md
+          bodyFile: "Release.md"
                         
