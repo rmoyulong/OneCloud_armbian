@@ -86,23 +86,43 @@ jobs:
           # Don't update remote cache
           export GITHUB_ACTIONS=false
           cd build
-          sudo --preserve-env \
-            ./compile.sh build \
-              ALLOW_ROOT=yes \
-              BOARD=onecloud \
-              BRANCH=${{ github.event.inputs.BRANCH_TYPE }} \
-              RELEASE=${{ matrix.RELEASE_type }} \
-              KERNEL_CONFIGURE=no \
-              BUILD_MINIMAL=${{ matrix.IMAGE_TYPE == 'minimal' && 'yes' || 'no' }} \
-              BUILD_DESKTOP=${{ matrix.IMAGE_TYPE == 'desktop' && 'yes' || 'no' }} \
-              DESKTOP_ENVIRONMENT=xfce \
-              DESKTOP_ENVIRONMENT_CONFIG_NAME=config_base \
-              DESKTOP_APPGROUPS_SELECTED="" \
-              EXPERT=yes \
-              SKIP_EXTERNAL_TOOLCHAINS=yes \
-              CLEAN_LEVEL= \
-              USE_CCACHE=no \
-              COMPRESS_OUTPUTIMAGE=img
+          if [[ "${{ matrix.IMAGE_TYPE }}" == "*desktop*" ]]; then
+              sudo --preserve-env \
+                ./compile.sh build \
+                  ALLOW_ROOT=yes \
+                  BOARD=onecloud \
+                  BRANCH=${{ github.event.inputs.BRANCH_TYPE }} \
+                  RELEASE=${{ matrix.RELEASE_type }} \
+                  KERNEL_CONFIGURE=no \
+                  BUILD_MINIMAL=${{ matrix.IMAGE_TYPE == 'minimal' && 'yes' || 'no' }} \
+                  BUILD_DESKTOP=${{ matrix.IMAGE_TYPE == 'desktop' && 'yes' || 'no' }} \
+                  DESKTOP_ENVIRONMENT=xfce \
+                  DESKTOP_ENVIRONMENT_CONFIG_NAME=config_base \
+                  DESKTOP_APPGROUPS_SELECTED="" \
+                  EXPERT=yes \
+                  SKIP_EXTERNAL_TOOLCHAINS=yes \
+                  CLEAN_LEVEL= \
+                  USE_CCACHE=no \
+                  COMPRESS_OUTPUTIMAGE=img
+          else
+              sudo --preserve-env \
+                ./compile.sh build \
+                  ALLOW_ROOT=yes \
+                  BOARD=onecloud \
+                  BRANCH=${{ github.event.inputs.BRANCH_TYPE }} \
+                  RELEASE=${{ matrix.RELEASE_type }} \
+                  KERNEL_CONFIGURE=no \
+                  BUILD_MINIMAL=${{ matrix.IMAGE_TYPE == 'minimal' && 'yes' || 'no' }} \
+                  BUILD_DESKTOP=${{ matrix.IMAGE_TYPE == 'desktop' && 'yes' || 'no' }} \
+                  DESKTOP_ENVIRONMENT= \
+                  DESKTOP_ENVIRONMENT_CONFIG_NAME= \
+                  DESKTOP_APPGROUPS_SELECTED= \
+                  EXPERT=yes \
+                  SKIP_EXTERNAL_TOOLCHAINS=yes \
+                  CLEAN_LEVEL= \
+                  USE_CCACHE=no \
+                  COMPRESS_OUTPUTIMAGE=img
+          fi
           sudo chown $(id -u):$(id -g) -R output/
           
       - name: 安装依赖项
