@@ -24,18 +24,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        IMAGE_TYPE: [minimal, cli, desktop]
+        #IMAGE_TYPE: [minimal, cli, desktop]
+        IMAGE_TYPE: [minimal, cli]
         RELEASE_type:
           # - focal # Ubuntu 20.04 LTS
           # - jammy # Ubuntu 22.04 LTS
-          # - noble # Ubuntu 24.04 LTS
+          - noble # Ubuntu 24.04 LTS
           - oracular # Ubuntu 24.10
           - plucky # Ubuntu 25.04
           # - buster # Debian 10
           # - bullseye # Debian 11
           - bookworm # Debian 12
           - trixie # Debian 13
-          # - sid # Debian unstable
+          - sid # Debian unstable
         
     steps:
       - name: 清理服务器空间(Ubuntu)
