@@ -76,13 +76,10 @@ jobs:
         run: |
            git clone --depth=1 --branch=main https://github.com/armbian/build build
            
-           TIME=$(date "+%Y-%m-%d %H:%M:%S")"
-           TAG="玩客云简化版-$(date "+%Y-%m-%d %H:%M:%S")""
-           cat <<EOF | sed -E 's/^  //' >>$GITHUB_ENV
-             c_time=$TIME
-             show_tag_name=$TAG
-           EOF
-           echo "env=$(cat $GITHUB_ENV | base64 -w 0)" >>$GITHUB_OUTPUT
+           export CORE_DATE=$(TZ=UTC-8 date +"%y.%m.%d")
+           echo "CORE_DATE=$CORE_DATE" >> $GITHUB_ENV
+           show_tag_name="玩客云armbian简化版"_${{env.CORE_DATE}}
+           echo "show_tag_name=$show_tag_name" >> $GITHUB_ENV
 
       - name: 编译
         run: |
@@ -184,12 +181,13 @@ jobs:
           cat <<EOF | sed -E 's/^  //' | tee Release.md
             $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
           EOF
-
-      - name: 上传编译好的成品
-        uses: softprops/action-gh-release@v2
+     
+      - name: 生成标签，上传固件
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: "${{ env.show_tag_name }}"
-          append_body: true
-          body_path: Release.md
-          files: |
-            build/output/images/*
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{env.show_tag_name}}
+          artifacts: build/output/images/*
+          body: Release.md
+                        
