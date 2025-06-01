@@ -1,4 +1,4 @@
-name: 构建玩客云armbain最新固件
+name: 玩客云armbain最新版
 
 on:
   #对应的是 UTC 时间，需要转换，0 代表北京时间8点，每个月1日/15日12点编译一次
@@ -24,8 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        #IMAGE_TYPE: [minimal, cli, desktop]
-        IMAGE_TYPE: [minimal, cli]
+        IMAGE_TYPE: [minimal, cli, desktop]
         RELEASE_type:
           # - focal # Ubuntu 20.04 LTS
           # - jammy # Ubuntu 22.04 LTS
@@ -72,15 +71,15 @@ jobs:
           echo "--------------------------硬盘信息--------------------------"
           echo "硬盘数量：$(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT
     
-      - name: 下载armbian Git
+      - name: 下载最新armbian库
         run: |
            git clone --depth=1 --branch=main https://github.com/armbian/build build
            
            export CORE_DATE=$(TZ=UTC-8 date +"%y.%m.%d")
            echo "CORE_DATE=$CORE_DATE" >> $GITHUB_ENV
-           ok_name="Onecloud_Armbain"
-           show_tag_name=$ok_name_${{env.CORE_DATE}}
-           echo "show_tag_name=$show_tag_name" >> $GITHUB_ENV           
+           show_tag_name="Onecloud_Armbain_Latest" ${{env.CORE_DATE}}
+           echo "show_tag_name=$show_tag_name" >> $GITHUB_ENV 
+           echo $show_tag_name
 
       - name: 编译
         run: |
@@ -164,7 +163,7 @@ jobs:
       - name: 上传成品版本
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.show_tag_name }}
+          tag_name: ${{env.show_tag_name}}
           append_body: true
           body_path: Release.md
           files: |
