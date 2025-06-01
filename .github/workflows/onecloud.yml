@@ -180,7 +180,15 @@ jobs:
           cat <<EOF | sed -E 's/^  //' | tee Release.md
             $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
           EOF
-     
+
+      - name: 获得固件信息
+        run: |
+          cd build/output/images/*
+          kword=$(cat *.manifest | grep ^kernel | cut -d- -f2 | tr -d ' ')
+          KERNEL=${kword%~*}
+          echo "KERNEL=$KERNEL" >> $GITHUB_ENV
+          cat sha256sums
+          
       - name: 生成标签，上传固件
         uses: ncipollo/release-action@main
         with:
@@ -188,5 +196,11 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{env.show_tag_name}}
           artifacts: build/output/images/*
-          bodyFile: "Release.md"
+          body: | 
+            ====================🧊固件信息🧊=======================
+            ➦ 💻 固件源码：https://github.com/armbian/build
+            ➦ 💝 源码分支：${{ github.event.inputs.BRANCH_TYPE }}
+            ➦ 🚀 内核版本：${{ env.KERNEL }}
+            ➦ 🌐 默认用户：root
+            ➦ 🔑 默认密码：1234
                         

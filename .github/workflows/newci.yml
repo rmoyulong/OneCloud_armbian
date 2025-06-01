@@ -187,4 +187,10 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{env.show_tag_name}}
           artifacts: build/output/images/*
-          bodyFile: "Release.md"
+          body: | 
+            ====================🧊固件信息🧊=======================
+            ➦ 💻 固件源码：https://github.com/armbian/build
+            ➦ 💝 源码分支：${{ github.event.inputs.BRANCH_TYPE }}
+            ➦ 🚀 内核版本：${{ env.KERNEL }}
+            ➦ 🌐 默认用户：root
+            ➦ 🔑 默认密码：1234
