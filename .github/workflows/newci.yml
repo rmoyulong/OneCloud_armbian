@@ -179,14 +179,6 @@ jobs:
           cat <<EOF | sed -E 's/^  //' | tee Release.md
             $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
           EOF
-
-      - name: 获得固件信息
-        run: |
-          cd build/output/images
-          kword=$(cat *.manifest | grep ^kernel | cut -d- -f2 | tr -d ' ')
-          KERNEL=${kword%~*}
-          echo "KERNEL=$KERNEL" >> $GITHUB_ENV
-          cat sha256sums
           
       - name: 生成标签，上传固件
         uses: ncipollo/release-action@main
