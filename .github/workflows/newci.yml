@@ -76,7 +76,7 @@ jobs:
         run: |
            git clone --depth=1 --branch=main https://github.com/armbian/build build
            
-           CORE_DATE=$(TZ=UTC-8 date +"%y.%m.%d")
+           CORE_DATE=$(TZ=Asia/Shanghai date +"%y.%m.%d")
            CORE_TAG="玩客云armbian最新版_"
            show_tag_name=${CORE_TAG}${CORE_DATE}
            echo "show_tag_name=$show_tag_name" >> $GITHUB_ENV
