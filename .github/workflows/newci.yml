@@ -15,7 +15,7 @@ on:
         - edge
 
 env:
-  show_tag_name: 玩客云最新版-$(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')
+  show_tag_name: "玩客云最新版-$(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')"
 
 #CI权限
 permissions: write-all
