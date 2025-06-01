@@ -183,7 +183,7 @@ jobs:
           EOF
      
       - name: 生成标签，上传固件
-        uses: ncipollo/release-action@v1
+        uses: ncipollo/release-action@main
         with:
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
