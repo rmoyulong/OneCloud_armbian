@@ -75,7 +75,7 @@ jobs:
         run: |
            git clone --depth=1 --branch=main https://github.com/armbian/build build
            
-           export CORE_DATE=$(TZ=UTC-8 date +"%y.%m.%d")
+           CORE_DATE=$(date +"%Y-%m-%d")
            echo "CORE_DATE=$CORE_DATE" >> $GITHUB_ENV
            show_tag_name="Onecloud_Armbain_Latest" ${{env.CORE_DATE}}
            echo "show_tag_name=$show_tag_name" >> $GITHUB_ENV 
