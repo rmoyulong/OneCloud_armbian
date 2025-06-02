@@ -183,41 +183,17 @@ jobs:
             $(cat $shafile | awk '{printf "%s: `%s`\n", $2, $1}')
           EOF
           
-      - name: 提取内核版本
+      - name: 提取版本编号
         run: |  
-            Image_File=$(find . -maxdepth 1 -type f -name 'Armbian-unofficial_*.img.xz' -printf '%f\n' | head -n 1)
-            [ -z "$Image_File" ] && { echo "No image files found."; exit 1; }
-            echo "Image_File: $Image_File"
-            
-            array=(${Image_File//_/ })
-            
-            for var in ${array[@]}
-            do
-               echo $var
-               get_var=$var
-            done
-            
-            array=(${get_var//./ })  
-            sum=0
-            s_version=""
-            for var in ${array[@]}
-            do
-               echo $var
-               let sum=$sum+1
-               if [ $sum < 3 ] ; then
-               
-                 if [ $sum == 1 ] ; then
-                   s_version=${var}
-                 else
-                   s_version=${s_version}.${var}
-                 fi
-                 
-                 echo $sum
-               fi
-            done
+          Image_File=$(find . -maxdepth 1 -type f -name 'Armbian-unofficial_*.img.xz' -printf '%f\n' | head -n 1)
+          [ -z "$Image_File" ] && { echo "No image files found."; exit 1; }
+          echo "Image_File: $Image_File"
+          version=$(echo "$Image_File" | cut -d '_' -f 2)
+          echo "version=$version" >> $GITHUB_ENV
+          echo "version: $version"
           
-          # 将内核版本号设置为环境变量  
-          echo "version=$s_version" >> $GITHUB_ENV
+          # 版本编号设置为环境变量  
+          echo "version=$version" >> $GITHUB_ENV
           
       - name: 生成标签，上传固件
         uses: rmoyulong/action-gh-release@master
@@ -230,6 +206,6 @@ jobs:
             ====================🧊固件信息🧊=======================
             ➦ 💻 固件源码：https://github.com/armbian/build
             ➦ 💝 源码分支：${{ github.event.inputs.BRANCH_TYPE }}
-            ➦ 🚀 内核版本：${{ env.version }}
+            ➦ 🚀 版本编号：${{ env.version }}
             ➦ 🌐 默认用户：root
             ➦ 🔑 默认密码：1234
