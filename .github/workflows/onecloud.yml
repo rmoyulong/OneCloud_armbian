@@ -188,7 +188,7 @@ jobs:
       - name: 生成标签，上传固件
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{env.CORE_TAG}}_${{env.CORE_DATE}}
+          tag_name: ${{env.CORE_TAG}}
           append_body: true
           body_path: Release.md
           files: |
