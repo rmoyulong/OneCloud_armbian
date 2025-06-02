@@ -13,7 +13,7 @@ on:
         options:
         - current
         - edge
- 
+
 #CI权限
 permissions:
   contents: write
@@ -82,7 +82,7 @@ jobs:
            export CORE_TAG=${TAG}
            echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
            echo ${TAG}
-
+           
       - name: 编译
         run: |
           # Don't update remote cache
@@ -125,6 +125,8 @@ jobs:
                   USE_CCACHE=no \
                   COMPRESS_OUTPUTIMAGE=img
           fi
+          
+
           sudo chown $(id -u):$(id -g) -R output/
           
       - name: 安装依赖项
@@ -191,4 +193,3 @@ jobs:
           body_path: Release.md
           files: |
             build/output/images/*.xz
-
