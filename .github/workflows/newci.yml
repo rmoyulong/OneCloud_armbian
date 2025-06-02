@@ -192,9 +192,7 @@ jobs:
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{env.CORE_TAG}}
-          artifacts: build/output/images/*
-          removeArtifacts: false 
-          replacesArtifacts: true          
+          artifacts: build/output/images/*.xz
           body: | 
             ====================🧊固件信息🧊=======================
             ➦ 💻 固件源码：https://github.com/armbian/build
