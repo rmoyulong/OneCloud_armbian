@@ -184,14 +184,6 @@ jobs:
           cat <<EOF | sed -E 's/^  //' | tee Release.md
             $(cat $shafile | awk '{printf "%s: `%s`\n", $2, $1}')
           EOF
-          
-      - name: 生成发布信息
-        run: |
-          shafile=$(ls build/output/images/*.sha)
-          cat <<EOF | sed -E 's/^  //' | tee Release.md
-            $(cat $shafile | awk '{printf "%s: `%s`\n", $2, $1}')
-          EOF
-          
          
       - name: 生成标签，上传固件
         uses: softprops/action-gh-release@v2
