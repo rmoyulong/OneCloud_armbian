@@ -1,4 +1,4 @@
-name: 玩客云armbain简版
+name: 玩客云armbain简化版
 
 on:
   #对应的是 UTC 时间，需要转换，0 代表北京时间8点，每个月1日/15日12点编译一次
@@ -14,8 +14,8 @@ on:
         - current
         - edge
 
-#CI权限
-permissions: write-all
+permissions:
+  contents: write
   
 jobs:
   build_armbian_firmware:
@@ -24,8 +24,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        #IMAGE_TYPE: [minimal, cli, desktop]
-        IMAGE_TYPE: [minimal, cli]
+        IMAGE_TYPE: 
+          - minimal
+          - cli
+          #- desktop         
         RELEASE_type:
           # - focal # Ubuntu 20.04 LTS
           # - jammy # Ubuntu 22.04 LTS
@@ -172,17 +174,18 @@ jobs:
 
       - name: 进行哈希处理和压缩
         run: |
-          mkdir -p image_upload
+          mkdir -p imageupload
           for f in build/output/images/*.img; do
             xz --threads=0 --compress "$f"
-            mv build/output/images/*.xz image_upload
           done
+          
+          mv build/output/images/*.xz imageupload
           
       - name: 提取版本号
         run: |  
           # 提取版本号
-          # latest_image=$(ls image_upload/Armbian-unofficial_*.burn.img.xz | grep -oE 'Armbian-unofficial_[0-9.]+_.*' | sort -V | tail -n 1) 
-          latest_image=$(ls image_upload/Armbian-unofficial_*.burn.img.xz | sort -V | tail -n 1)
+          # latest_image=$(ls imageupload/Armbian-unofficial_*.burn.img.xz | grep -oE 'Armbian-unofficial_[0-9.]+_.*' | sort -V | tail -n 1) 
+          latest_image=$(ls imageupload/Armbian-unofficial_*.burn.img.xz | sort -V | tail -n 1)
           version=$(echo "$latest_image" | cut -d'_' -f 2)  
   
           # 将版本号设置为环境变量  
@@ -194,7 +197,7 @@ jobs:
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{env.CORE_TAG}}
-          artifacts: image_upload/*
+          artifacts: imageupload/*
           body: | 
             ====================🧊固件信息🧊=======================
             ➦ 💻 固件源码：https://github.com/armbian/build
