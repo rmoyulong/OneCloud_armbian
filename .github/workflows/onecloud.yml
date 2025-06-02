@@ -76,10 +76,11 @@ jobs:
         run: |
            git clone --depth=1 --branch=main https://github.com/armbian/build build
            
-           CORE_DATE=$(TZ=Asia/Shanghai date +"%y.%m.%d")
-           CORE_TAG="玩客云armbian简化版_"
-           show_tag_name=${CORE_TAG}${CORE_DATE}
-           echo "show_tag_name=$show_tag_name" >> $GITHUB_ENV
+           export CORE_DATE=$(TZ=Asia/Shanghai date +"%y.%m.%d")
+           export CORE_TAG="玩客云armbian简化版"
+           echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
+           echo "CORE_DATE=$CORE_DATE" >> $GITHUB_ENV
+           
       - name: 编译
         run: |
           # Don't update remote cache
@@ -186,20 +187,18 @@ jobs:
           # 提取版本号
           # latest_image=$(ls ${{ github.workspace }}/build/output/images/Armbian-unofficial_*.img.xz | grep -oE 'Armbian-unofficial_[0-9.]+_.*' | sort -V | tail -n 1) 
           latest_image=$(ls ${{ github.workspace }}/build/output/images/Armbian-unofficial_*.img.xz | sort -V | tail -n 1)
-          version=$(echo "$latest_image" | cut -d'_' -f2)  
-  
+          version=$(echo "$latest_image" | cut -d'_' -f2)
+          
           # 将版本号设置为环境变量  
-          echo "VERSION=$version" >> $GITHUB_ENV
+          echo "version=$version" >> $GITHUB_ENV
           
       - name: 生成标签，上传固件
-        uses: ncipollo/release-action@main
+        uses: rmoyulong/action-gh-release@master
         with:
-          allowUpdates: true
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{env.show_tag_name}}
-          artifacts: build/output/images/*
-          removeArtifacts: false 
-          replacesArtifacts: true          
+          tag_name: ${{env.CORE_TAG}}_${{env.CORE_DATE}}
+          append_body: true
+          #body_path: Release.md          
+          files: build/output/images/*      
           body: | 
             ====================🧊固件信息🧊=======================
             ➦ 💻 固件源码：https://github.com/armbian/build
