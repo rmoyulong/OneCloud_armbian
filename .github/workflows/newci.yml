@@ -180,12 +180,6 @@ jobs:
           
           DESKTOP_ENVIRONMENT="xfce"
           echo "DESKTOP_ENVIRONMENT=$DESKTOP_ENVIRONMENT" >> $GITHUB_ENV
-
-      - name: 上传档案
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.RELEASE_type }}-${{ github.event.inputs.BRANCH_TYPE }}-${{ matrix.IMAGE_TYPE == 'desktop' && env.DESKTOP_ENVIRONMENT || matrix.IMAGE_TYPE }}
-          path: build/output/images/*
           
       - name: 生成发布信息
         run: |
