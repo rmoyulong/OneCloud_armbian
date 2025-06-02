@@ -200,4 +200,4 @@ jobs:
           append_body: true
           body_path: Release.md
           files: |
-            build/output/images/*
+            build/output/images/*.xz
