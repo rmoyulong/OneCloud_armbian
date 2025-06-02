@@ -178,12 +178,18 @@ jobs:
             xz --threads=0 --compress "$f"
           done
 
+      - name: 上传档案
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.RELEASE_type }}-${{ github.event.inputs.BRANCH_TYPE }}-${{ matrix.IMAGE_TYPE == 'desktop' && "xfce" || matrix.IMAGE_TYPE }}
+          path: build/output/images/*
+          
       - name: 生成发布信息
         run: |
           cat <<EOF | sed -E 's/^  //' | tee Release.md
             $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
           EOF
-         
+          
       - name: 生成标签，上传固件
         uses: softprops/action-gh-release@v2
         with:
