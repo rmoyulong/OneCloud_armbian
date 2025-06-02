@@ -14,7 +14,7 @@ on:
         - current
         - edge
 env:
-  CORE_DATE: $(TZ=Asia/Shanghai date +"%Y-%m-%d %H")
+  CORE_DATE: export $(TZ=Asia/Shanghai date +"%Y-%m-%d_%H")
   
 #CI权限
 permissions:
@@ -79,10 +79,8 @@ jobs:
         run: |
            git clone --depth=1 --branch=main https://github.com/armbian/build build
            
-           export CORE_DATE1=${{ env.CORE_DATE }}
            export CORE_TAG="玩客云armbian简化版"
            echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
-           echo "CORE_DATE=$CORE_DATE1" >> $GITHUB_ENV
            
       - name: 编译
         run: |
