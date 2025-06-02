@@ -206,9 +206,9 @@ jobs:
             do
                echo $var
                let sum=$sum+1
-               if [ $sum -le 3 ] ; then
+               if [ $sum < 3 ] ; then
                
-                 if [ $sum -eq 1 ] ; then
+                 if [ $sum == 1 ] ; then
                    s_version=${var}
                  else
                    s_version=${s_version}.${var}
