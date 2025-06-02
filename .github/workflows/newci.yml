@@ -183,29 +183,13 @@ jobs:
             $(cat $shafile | awk '{printf "%s: `%s`\n", $2, $1}')
           EOF
           
-      - name: 提取版本编号
-        run: |  
-          Image_File=$(find . -maxdepth 1 -type f -name 'Armbian-unofficial_*.img.xz' -printf '%f\n' | head -n 1)
-          [ -z "$Image_File" ] && { echo "No image files found."; exit 1; }
-          echo "Image_File: $Image_File"
-          version=$(echo "$Image_File" | cut -d '_' -f 2)
-          echo "version=$version" >> $GITHUB_ENV
-          echo "version: $version"
-          
-          # 版本编号设置为环境变量  
-          echo "version=$version" >> $GITHUB_ENV
-          
+         
       - name: 生成标签，上传固件
-        uses: rmoyulong/action-gh-release@master
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{env.CORE_TAG}}_${{env.CORE_DATE}}
-          append_body: false
-          #body_path: Release.md          
-          files: build/output/images/*      
-          body: | 
-            ====================🧊固件信息🧊=======================
-            ➦ 💻 固件源码：https://github.com/armbian/build
-            ➦ 💝 源码分支：${{ github.event.inputs.BRANCH_TYPE }}
-            ➦ 🚀 版本编号：${{ env.version }}
-            ➦ 🌐 默认用户：root
-            ➦ 🔑 默认密码：1234
+          append_body: true
+          body_path: Release.md
+          files: |
+            build/output/images/*
+
