@@ -13,7 +13,9 @@ on:
         options:
         - current
         - edge
-
+env:
+  CORE_DATE: $(TZ=Asia/Shanghai date +"%y.%m.%d")
+  
 #CI权限
 permissions: write-all
   
@@ -76,10 +78,10 @@ jobs:
         run: |
            git clone --depth=1 --branch=main https://github.com/armbian/build build
            
-           export CORE_DATE=$(TZ=Asia/Shanghai date +"%y.%m.%d")
+           export CORE_DATE1=${{ env.CORE_DATE }}
            export CORE_TAG="玩客云armbian最新版"
            echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
-           echo "CORE_DATE=$CORE_DATE" >> $GITHUB_ENV          
+           echo "CORE_DATE=$CORE_DATE1" >> $GITHUB_ENV
 
       - name: 编译
         run: |
@@ -181,15 +183,41 @@ jobs:
             $(cat $shafile | awk '{printf "%s: `%s`\n", $2, $1}')
           EOF
           
-      - name: 提取版本号
+      - name: 提取内核版本
         run: |  
-          # 提取版本号
-          # latest_image=$(ls ${{ github.workspace }}/build/output/images/Armbian-unofficial_*.img.xz | grep -oE 'Armbian-unofficial_[0-9.]+_.*' | sort -V | tail -n 1) 
-          latest_image=$(ls ${{ github.workspace }}/build/output/images/Armbian-unofficial_*.img.xz | sort -V | tail -n 1)
-          version=$(echo "$latest_image" | cut -d'_' -f 2)
+            Image_File=$(find . -maxdepth 1 -type f -name 'Armbian-unofficial_*.img.xz' -printf '%f\n' | head -n 1)
+            [ -z "$Image_File" ] && { echo "No image files found."; exit 1; }
+            echo "Image_File: $Image_File"
+            
+            array=(${Image_File//_/ })
+            
+            for var in ${array[@]}
+            do
+               echo $var
+               get_var=$var
+            done
+            
+            array=(${get_var//./ })  
+            sum=0
+            s_version=""
+            for var in ${array[@]}
+            do
+               echo $var
+               let sum=$sum+1
+               if [ $sum -le 3 ] ; then
+               
+                 if [ $sum -eq 1 ] ; then
+                   s_version=${var}
+                 else
+                   s_version=${s_version}.${var}
+                 fi
+                 
+                 echo $sum
+               fi
+            done
           
-          # 将版本号设置为环境变量  
-          echo "version=$version" >> $GITHUB_ENV
+          # 将内核版本号设置为环境变量  
+          echo "version=$s_version" >> $GITHUB_ENV
           
       - name: 生成标签，上传固件
         uses: rmoyulong/action-gh-release@master
@@ -202,6 +230,6 @@ jobs:
             ====================🧊固件信息🧊=======================
             ➦ 💻 固件源码：https://github.com/armbian/build
             ➦ 💝 源码分支：${{ github.event.inputs.BRANCH_TYPE }}
-            ➦ 🚀 编译版本：${{ env.version }}
+            ➦ 🚀 内核版本：${{ env.version }}
             ➦ 🌐 默认用户：root
             ➦ 🔑 默认密码：1234
