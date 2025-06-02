@@ -192,7 +192,7 @@ jobs:
           echo "version=$version" >> $GITHUB_ENV
           
       - name: 生成标签，上传固件
-        uses: ncipollo/release-action@main
+        uses: ncipollo/release-action@v2
         with:
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
