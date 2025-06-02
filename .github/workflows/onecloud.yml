@@ -172,22 +172,23 @@ jobs:
       - name: 进行哈希处理和压缩
         run: |
           for f in build/output/images/*.img; do
-            sha256sum "$f" | tee -a sha256sum
-            xz --threads=0 --compress "$f"
+            sha256sum "$f" >"${f}.sha"
+            xz -9 --threads=0 --compress "$f"
           done
 
       - name: 生成发布信息
         run: |
+          shafile=$(ls build/output/images/*.sha)
           cat <<EOF | sed -E 's/^  //' | tee Release.md
-            $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
+            $(cat $shafile | awk '{printf "%s: `%s`\n", $2, $1}')
           EOF
-
+          
       - name: 提取版本号
         run: |  
           # 提取版本号
           # latest_image=$(ls ${{ github.workspace }}/build/output/images/Armbian-unofficial_*.img.xz | grep -oE 'Armbian-unofficial_[0-9.]+_.*' | sort -V | tail -n 1) 
           latest_image=$(ls ${{ github.workspace }}/build/output/images/Armbian-unofficial_*.img.xz | sort -V | tail -n 1)
-          version=$(echo "$latest_image" | cut -d'_' -f2)
+          version=$(echo "$latest_image" | cut -d'_' -f 2)
           
           # 将版本号设置为环境变量  
           echo "version=$version" >> $GITHUB_ENV
@@ -196,7 +197,7 @@ jobs:
         uses: rmoyulong/action-gh-release@master
         with:
           tag_name: ${{env.CORE_TAG}}_${{env.CORE_DATE}}
-          append_body: true
+          append_body: false
           #body_path: Release.md          
           files: build/output/images/*      
           body: | 
