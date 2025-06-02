@@ -172,8 +172,10 @@ jobs:
 
       - name: 进行哈希处理和压缩
         run: |
+          mkdir -p image_upload
           for f in build/output/images/*.img; do
             xz --threads=0 --compress "$f"
+            mv build/output/images/*.xz upload
           done
           
       - name: 提取版本号
@@ -192,7 +194,7 @@ jobs:
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{env.CORE_TAG}}
-          artifacts: build/output/images/*.xz
+          artifacts: image_upload/*
           body: | 
             ====================🧊固件信息🧊=======================
             ➦ 💻 固件源码：https://github.com/armbian/build
