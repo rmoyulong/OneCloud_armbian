@@ -175,7 +175,7 @@ jobs:
           mkdir -p image_upload
           for f in build/output/images/*.img; do
             xz --threads=0 --compress "$f"
-            mv build/output/images/*.xz upload
+            mv build/output/images/*.xz image_upload
           done
           
       - name: 提取版本号
