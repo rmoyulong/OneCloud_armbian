@@ -174,24 +174,32 @@ jobs:
       - name: 进行哈希处理和压缩
         run: |
           for f in build/output/images/*.img; do
-            sha256sum "$f" | tee -a sha256sum
             xz --threads=0 --compress "$f"
           done
           
-          DESKTOP_ENVIRONMENT="xfce"
-          echo "DESKTOP_ENVIRONMENT=$DESKTOP_ENVIRONMENT" >> $GITHUB_ENV
-          
-      - name: 生成发布信息
-        run: |
-          cat <<EOF | sed -E 's/^  //' | tee Release.md
-            $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
-          EOF
+      - name: 提取版本号
+        run: |  
+          # 提取版本号
+          # latest_image=$(ls build/output/images/Armbian-unofficial_*.burn.img.xz | grep -oE 'Armbian-unofficial_[0-9.]+_.*' | sort -V | tail -n 1) 
+          latest_image=$(ls build/output/images/Armbian-unofficial_*.burn.img.xz | sort -V | tail -n 1)
+          version=$(echo "$latest_image" | cut -d'_' -f 2)  
+  
+          # 将版本号设置为环境变量  
+          echo "version=$version" >> $GITHUB_ENV
           
       - name: 生成标签，上传固件
-        uses: softprops/action-gh-release@master
+        uses: ncipollo/release-action@main
         with:
-          tag_name: ${{env.CORE_TAG}}
-          append_body: true
-          body_path: Release.md
-          files: |
-            build/output/images/*.xz
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{env.CORE_TAG}}
+          artifacts: build/output/images/*
+          removeArtifacts: false 
+          replacesArtifacts: true          
+          body: | 
+            ====================🧊固件信息🧊=======================
+            ➦ 💻 固件源码：https://github.com/armbian/build
+            ➦ 💝 源码分支：${{ github.event.inputs.BRANCH_TYPE }}
+            ➦ 🚀 编译版本：${{ env.version }}
+            ➦ 🌐 默认用户：root
+            ➦ 🔑 默认密码：1234
