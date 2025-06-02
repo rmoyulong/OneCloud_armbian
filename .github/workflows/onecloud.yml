@@ -173,16 +173,15 @@ jobs:
 
       - name: 进行哈希处理和压缩
         run: |
-          for f in build/output/images/*.img; do
-            sha256sum "$f" >"${f}.sha"
-            xz -9 --threads=0 --compress "$f"
+          for f in output/images/*.img; do
+            sha256sum "$f" | tee -a sha256sum
+            xz --threads=0 --compress "$f"
           done
 
       - name: 生成发布信息
         run: |
-          shafile=$(ls build/output/images/*.sha)
           cat <<EOF | sed -E 's/^  //' | tee Release.md
-            $(cat $shafile | awk '{printf "%s: `%s`\n", $2, $1}')
+            $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
           EOF
          
       - name: 生成标签，上传固件
@@ -192,4 +191,4 @@ jobs:
           append_body: true
           body_path: Release.md
           files: |
-            build/output/images/*.xz
+            build/output/images/*
