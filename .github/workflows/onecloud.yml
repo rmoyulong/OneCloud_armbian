@@ -14,7 +14,7 @@ on:
         - current
         - edge
 env:
-  CORE_DATE: $(TZ=Asia/Shanghai date +"%y.%m.%d")
+  CORE_DATE: $(TZ=Asia/Shanghai date +"%Y-%m-%d %H")
   
 #CI权限
 permissions: write-all
@@ -192,4 +192,4 @@ jobs:
           append_body: true
           body_path: Release.md
           files: |
-            build/output/images/*
+            build/output/images/*.xz
