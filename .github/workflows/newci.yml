@@ -173,7 +173,7 @@ jobs:
 
       - name: 进行哈希处理和压缩
         run: |
-          for f in output/images/*.img; do
+          for f in build/output/images/*.img; do
             sha256sum "$f" | tee -a sha256sum
             xz --threads=0 --compress "$f"
           done
