@@ -192,7 +192,7 @@ jobs:
           echo "version=$version" >> $GITHUB_ENV
           
       - name: 生成标签，上传固件
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@master
         with:
           tag_name: ${{ env.CORE_TAG }}
           #append_body: true
