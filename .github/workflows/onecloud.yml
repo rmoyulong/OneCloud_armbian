@@ -192,12 +192,12 @@ jobs:
           echo "version=$version" >> $GITHUB_ENV
           
       - name: 生成标签，上传固件
-        uses: ncipollo/release-action@v2
+        uses: softprops/action-gh-release@v2
         with:
-          allowUpdates: true
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{env.CORE_TAG}}
-          artifacts: imageupload/*
+          tag_name: ${{ env.CORE_TAG }}
+          append_body: true
+          files: |
+            imageupload/*
           body: | 
             ====================🧊固件信息🧊=======================
             ➦ 💻 固件源码：https://github.com/armbian/build
