@@ -181,8 +181,8 @@ jobs:
       - name: 提取版本号
         run: |  
           # 提取版本号
-          # latest_image=$(ls build/output/images/Armbian-unofficial_*.burn.img.xz | grep -oE 'Armbian-unofficial_[0-9.]+_.*' | sort -V | tail -n 1) 
-          latest_image=$(ls build/output/images/Armbian-unofficial_*.burn.img.xz | sort -V | tail -n 1)
+          # latest_image=$(ls image_upload/Armbian-unofficial_*.burn.img.xz | grep -oE 'Armbian-unofficial_[0-9.]+_.*' | sort -V | tail -n 1) 
+          latest_image=$(ls image_upload/Armbian-unofficial_*.burn.img.xz | sort -V | tail -n 1)
           version=$(echo "$latest_image" | cut -d'_' -f 2)  
   
           # 将版本号设置为环境变量  
