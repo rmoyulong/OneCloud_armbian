@@ -15,8 +15,7 @@ on:
         - edge
 
 #CI权限
-permissions:
-  contents: write
+permissions: write-all
   
 jobs:
   build_armbian_firmware:
