@@ -17,7 +17,8 @@ env:
   CORE_DATE: $(TZ=Asia/Shanghai date +"%Y-%m-%d %H")
   
 #CI权限
-permissions: write-all
+permissions:
+  contents: write
   
 jobs:
   build_armbian_firmware:
