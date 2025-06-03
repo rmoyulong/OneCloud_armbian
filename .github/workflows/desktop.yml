@@ -23,8 +23,10 @@ permissions:
   contents: write
   
 jobs:
-  build-debs:
-    name: 初始化编译-${{ github.event.inputs.BRANCH_TYPE }}
+  prepare:
+    name: Prepare
+    outputs:
+      env: ${{ steps.get.outputs.env }}
     runs-on: ubuntu-latest
     steps:
       - name: 检查环境
@@ -35,10 +37,18 @@ jobs:
            git clone --depth=1 --branch=main https://github.com/armbian/build build
            
            TIME="$(curl https://api.github.com/repos/${{ github.repository }}/actions/runs/${GITHUB_RUN_ID} | jq -r .created_at)"
-           TAG="玩客云armbian最新版-$(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')"
+           TAG="玩客云armbian桌面版-$(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')"
            export CORE_TAG=${TAG}
            echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
-           echo ${TAG} 
+           
+          cat <<EOF | sed -E 's/^  //' >>$GITHUB_ENV
+            TIME=$TIME
+            TAG=$TAG
+            CORE_TAG=$CORE_TAG
+            PATCHES={${PATCHES}}
+            PATCHES_DISABLED={${PATCHES_DISABLED}}
+          EOF
+          echo "env=$(cat $GITHUB_ENV | base64 -w 0)" >>$GITHUB_OUTPUT
            
       - name: 打补丁
         run: |
@@ -71,18 +81,19 @@ jobs:
       - name: 上传资料
         uses: actions/upload-artifact@v4
         with:
-          name: debs-${{ matrix.BRANCH }}
+          name: debs-${{ github.event.inputs.BRANCH_TYPE }
           path: build/output/debs/*
 
       - name: 上传标签
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.TAG }}
+          tag_name: ${{ env.CORE_TAG }}
           files: |
             build/output/debs/*
 
   build_armbian_firmware:
     name:  编译-${{ github.event.inputs.BRANCH_TYPE }}_${{ matrix.TYPE }}_${{ matrix.RELEASE }}
+    needs: prepare
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -119,7 +130,11 @@ jobs:
           large-packages: true
           docker-images: true
           swap-storage: true
-            
+
+      - name: 获得环境变量
+        run: |
+          echo "$(echo "${{ needs.prepare.outputs.env }}" | base64 -d)" >>$GITHUB_ENV
+          
       - name: 检查项目
         uses: actions/checkout@main
  
@@ -142,7 +157,7 @@ jobs:
            git clone --depth=1 --branch=main https://github.com/armbian/build build
            
            TIME="$(curl https://api.github.com/repos/${{ github.repository }}/actions/runs/${GITHUB_RUN_ID} | jq -r .created_at)"
-           TAG="玩客云armbian最新版-$(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')"
+           TAG="玩客云armbian桌面版-$(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')"
            export CORE_TAG=${TAG}
            echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
            echo ${TAG}
@@ -164,7 +179,7 @@ jobs:
       - name: 下载debs资料
         uses: actions/download-artifact@v4
         with:
-          name: debs-${{ matrix.BRANCH }}
+          name: debs-${{ github.event.inputs.BRANCH_TYPE }
           path: build/output/debs/
           
       - name: 编译
