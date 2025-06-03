@@ -42,8 +42,8 @@ jobs:
           # - trixie # Debian 13
           # - sid # Debian unstable
         TYPE:
-          - minimal
-          - cli
+          #- minimal
+          #- cli
           - desktop      
         
     steps:
