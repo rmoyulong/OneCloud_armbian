@@ -13,6 +13,9 @@ on:
         options:
         - current
         - edge
+env:
+  PATCHES: 4077,5076
+  PATCHES_DISABLED: 5082
   
 permissions:
   contents: write
@@ -82,6 +85,20 @@ jobs:
            export CORE_TAG=${TAG}
            echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
            echo ${TAG}
+
+      - name: 打补丁
+        run: |
+          cd build
+          
+          echo "::group::Download"
+          curl -L -O "https://github.com/armbian/build/pull/{${PATCHES}}.patch"
+          echo "::endgroup::"
+          
+          for file in *.patch; do
+            echo "::group::Applying $file"
+            patch --batch -p1 -N <"$file"
+            echo "::endgroup::"
+          done
           
       - name: 编译
         run: |
