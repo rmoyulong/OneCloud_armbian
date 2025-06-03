@@ -25,8 +25,8 @@ permissions:
 jobs:
   build-debs:
     name: 初始化编译-${{ github.event.inputs.BRANCH_TYPE }}
-    runs-on: ubuntu-22.04
-
+    runs-on: ubuntu-latest
+    steps:
       - name: 检查环境
         uses: actions/checkout@v4
 
@@ -83,7 +83,7 @@ jobs:
 
   build_armbian_firmware:
     name:  编译-${{ github.event.inputs.BRANCH_TYPE }}_${{ matrix.TYPE }}_${{ matrix.RELEASE }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
