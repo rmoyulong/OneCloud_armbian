@@ -14,6 +14,11 @@ on:
         - current
         - edge
 
+env:
+  DESKTOP_ENVIRONMENT: xfce
+  DESKTOP_ENVIRONMENT_CONFIG_NAME: config_base
+  DESKTOP_APPGROUPS_SELECTED: "" 
+  
 permissions:
   contents: write
   
@@ -38,12 +43,7 @@ jobs:
         TYPE:
           - minimal
           - cli
-          #- desktop
-        include:
-          - TYPE: desktop
-            DESKTOP_ENVIRONMENT: xfce
-            DESKTOP_ENVIRONMENT_CONFIG_NAME: config_base
-            DESKTOP_APPGROUPS_SELECTED: ""         
+          #- desktop      
         
     steps:
       - name: 清理服务器空间(Ubuntu)
@@ -101,9 +101,9 @@ jobs:
               KERNEL_CONFIGURE=no \
               BUILD_MINIMAL=${{ matrix.TYPE == 'minimal' && 'yes' || 'no' }} \
               BUILD_DESKTOP=${{ matrix.TYPE == 'desktop' && 'yes' || 'no' }} \
-              DESKTOP_ENVIRONMENT=${{ matrix.DESKTOP_ENVIRONMENT }} \
-              DESKTOP_ENVIRONMENT_CONFIG_NAME=${{ matrix.DESKTOP_ENVIRONMENT_CONFIG_NAME }} \
-              DESKTOP_APPGROUPS_SELECTED=${{ matrix.DESKTOP_APPGROUPS_SELECTED }} \
+              DESKTOP_ENVIRONMENT=${{ env.DESKTOP_ENVIRONMENT }} \
+              DESKTOP_ENVIRONMENT_CONFIG_NAME=${{ env.DESKTOP_ENVIRONMENT_CONFIG_NAME }} \
+              DESKTOP_APPGROUPS_SELECTED=${{ env.DESKTOP_APPGROUPS_SELECTED }} \
               EXPERT=yes \
               SKIP_EXTERNAL_TOOLCHAINS=yes \
               CLEAN_LEVEL= \
