@@ -19,26 +19,31 @@ permissions:
   
 jobs:
   build_armbian_firmware:
-    name:  编译-${{ github.event.inputs.BRANCH_TYPE }}_${{ matrix.IMAGE_TYPE }}_${{ matrix.RELEASE_type }}
+    name:  编译-${{ github.event.inputs.BRANCH_TYPE }}_${{ matrix.TYPE }}_${{ matrix.RELEASE }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        IMAGE_TYPE: 
-          - minimal
-          - cli
-          #- desktop         
-        RELEASE_type:
+        RELEASE:
           # - focal # Ubuntu 20.04 LTS
           # - jammy # Ubuntu 22.04 LTS
-          - noble # Ubuntu 24.04 LTS
+          # - noble # Ubuntu 24.04 LTS
           - oracular # Ubuntu 24.10
           - plucky # Ubuntu 25.04
           # - buster # Debian 10
           # - bullseye # Debian 11
-          - bookworm # Debian 12
+          # - bookworm # Debian 12
           - trixie # Debian 13
           - sid # Debian unstable
+        TYPE:
+          - minimal
+          - cli
+          #- desktop
+        include:
+          - TYPE: desktop
+            DESKTOP_ENVIRONMENT: xfce
+            DESKTOP_ENVIRONMENT_CONFIG_NAME: config_base
+            DESKTOP_APPGROUPS_SELECTED: ""         
         
     steps:
       - name: 清理服务器空间(Ubuntu)
@@ -86,48 +91,24 @@ jobs:
            
       - name: 编译
         run: |
-          # Don't update remote cache
-          export GITHUB_ACTIONS=false
           cd build
-          if [[ "${{ matrix.IMAGE_TYPE }}" == "*desktop*" ]]; then
-              sudo --preserve-env \
-                ./compile.sh build \
-                  ALLOW_ROOT=yes \
-                  BOARD=onecloud \
-                  BRANCH=${{ github.event.inputs.BRANCH_TYPE }} \
-                  RELEASE=${{ matrix.RELEASE_type }} \
-                  KERNEL_CONFIGURE=no \
-                  BUILD_MINIMAL=${{ matrix.IMAGE_TYPE == 'minimal' && 'yes' || 'no' }} \
-                  BUILD_DESKTOP=${{ matrix.IMAGE_TYPE == 'desktop' && 'yes' || 'no' }} \
-                  DESKTOP_ENVIRONMENT="xfce" \
-                  DESKTOP_ENVIRONMENT_CONFIG_NAME="config_base" \
-                  DESKTOP_APPGROUPS_SELECTED="" \
-                  EXPERT=yes \
-                  SKIP_EXTERNAL_TOOLCHAINS=yes \
-                  CLEAN_LEVEL= \
-                  USE_CCACHE=no \
-                  COMPRESS_OUTPUTIMAGE=img
-          else
-              sudo --preserve-env \
-                ./compile.sh build \
-                  ALLOW_ROOT=yes \
-                  BOARD=onecloud \
-                  BRANCH=${{ github.event.inputs.BRANCH_TYPE }} \
-                  RELEASE=${{ matrix.RELEASE_type }} \
-                  KERNEL_CONFIGURE=no \
-                  BUILD_MINIMAL=${{ matrix.IMAGE_TYPE == 'minimal' && 'yes' || 'no' }} \
-                  BUILD_DESKTOP=${{ matrix.IMAGE_TYPE == 'desktop' && 'yes' || 'no' }} \
-                  DESKTOP_ENVIRONMENT= \
-                  DESKTOP_ENVIRONMENT_CONFIG_NAME= \
-                  DESKTOP_APPGROUPS_SELECTED= \
-                  EXPERT=yes \
-                  SKIP_EXTERNAL_TOOLCHAINS=yes \
-                  CLEAN_LEVEL= \
-                  USE_CCACHE=no \
-                  COMPRESS_OUTPUTIMAGE=img
-          fi
-          
-
+          sudo --preserve-env \
+            ./compile.sh build \
+              ALLOW_ROOT=yes \
+              BOARD=onecloud \
+              BRANCH=${{ github.event.inputs.BRANCH_TYPE }} \
+              RELEASE=${{ matrix.RELEASE }} \
+              KERNEL_CONFIGURE=no \
+              BUILD_MINIMAL=${{ matrix.TYPE == 'minimal' && 'yes' || 'no' }} \
+              BUILD_DESKTOP=${{ matrix.TYPE == 'desktop' && 'yes' || 'no' }} \
+              DESKTOP_ENVIRONMENT=${{ matrix.DESKTOP_ENVIRONMENT }} \
+              DESKTOP_ENVIRONMENT_CONFIG_NAME=${{ matrix.DESKTOP_ENVIRONMENT_CONFIG_NAME }} \
+              DESKTOP_APPGROUPS_SELECTED=${{ matrix.DESKTOP_APPGROUPS_SELECTED }} \
+              EXPERT=yes \
+              SKIP_EXTERNAL_TOOLCHAINS=yes \
+              CLEAN_LEVEL= \
+              USE_CCACHE=no \
+              COMPRESS_OUTPUTIMAGE=img
           sudo chown $(id -u):$(id -g) -R output/
           
       - name: 安装依赖项
@@ -174,34 +155,32 @@ jobs:
 
       - name: 进行哈希处理和压缩
         run: |
-          mkdir -p imageupload
           for f in build/output/images/*.img; do
+            sha256sum "$f" | tee -a sha256sum
             xz --threads=0 --compress "$f"
           done
-          
-          mv build/output/images/*.xz imageupload
+
+      - name: 生成发布信息
+        run: |
+          cat <<EOF | sed -E 's/^  //' | tee Release.md
+            $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
+          EOF          
           
       - name: 提取版本号
         run: |  
           # 提取版本号
-          # latest_image=$(ls imageupload/Armbian-unofficial_*.burn.img.xz | grep -oE 'Armbian-unofficial_[0-9.]+_.*' | sort -V | tail -n 1) 
-          latest_image=$(ls imageupload/Armbian-unofficial_*.burn.img.xz | sort -V | tail -n 1)
+          # latest_image=$(ls build/output/images/Armbian-unofficial_*.burn.img.xz | grep -oE 'Armbian-unofficial_[0-9.]+_.*' | sort -V | tail -n 1) 
+          latest_image=$(ls build/output/images/Armbian-unofficial_*.burn.img.xz | sort -V | tail -n 1)
           version=$(echo "$latest_image" | cut -d'_' -f 2)  
   
           # 将版本号设置为环境变量  
           echo "version=$version" >> $GITHUB_ENV
           
       - name: 生成标签，上传固件
-        uses: softprops/action-gh-release@master
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.CORE_TAG }}
-          #append_body: true
+          append_body: true
+          body_path: Release.md
           files: |
-            imageupload/*
-          body: | 
-            ====================🧊固件信息🧊=======================
-            ➦ 💻 固件源码：https://github.com/armbian/build
-            ➦ 💝 源码分支：${{ github.event.inputs.BRANCH_TYPE }}
-            ➦ 🚀 编译版本：${{ env.version }}
-            ➦ 🌐 默认用户：root
-            ➦ 🔑 默认密码：1234
+            build/output/images/*
