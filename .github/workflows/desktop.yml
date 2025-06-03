@@ -1,5 +1,5 @@
 name: 玩客云armbain桌面版
-#6.12内核只有plucky、bookworm编译成功
+#6.12内核只有plucky、bookworm、oracular、plucky编译成功
 
 on:
   #对应的是 UTC 时间，需要转换，0 代表北京时间8点，每个月1日/15日12点编译一次
@@ -33,8 +33,8 @@ jobs:
         RELEASE:
           # - focal # Ubuntu 20.04 LTS
           # - jammy # Ubuntu 22.04 LTS
-          # - noble # Ubuntu 24.04 LTS
-          # - oracular # Ubuntu 24.10
+          - noble # Ubuntu 24.04 LTS
+          - oracular # Ubuntu 24.10
           - plucky # Ubuntu 25.04
           # - buster # Debian 10
           # - bullseye # Debian 11
