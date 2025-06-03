@@ -46,6 +46,7 @@ jobs:
               CORE_TAG=$CORE_TAG
               PATCHES={${PATCHES}}
               PATCHES_DISABLED={${PATCHES_DISABLED}}
+              BRANCH_TYPE=${{ github.event.inputs.BRANCH_TYPE }}
            EOF
            echo "env=$(cat $GITHUB_ENV | base64 -w 0)" >>$GITHUB_OUTPUT
            
@@ -91,7 +92,7 @@ jobs:
             build/output/debs/*
 
   build_armbian_firmware:
-    name:  编译-${{ github.event.inputs.BRANCH_TYPE }}_${{ matrix.TYPE }}_${{ matrix.RELEASE }}
+    name:  编译-${{ matrix.TYPE }}_${{ matrix.RELEASE }}
     needs: prepare
     runs-on: ubuntu-latest
     strategy:
@@ -101,12 +102,12 @@ jobs:
           # - focal # Ubuntu 20.04 LTS
           # - jammy # Ubuntu 22.04 LTS
           # - noble # Ubuntu 24.04 LTS
-          - oracular # Ubuntu 24.10
+          # - oracular # Ubuntu 24.10
           - plucky # Ubuntu 25.04
           # - buster # Debian 10
-          - bullseye # Debian 11
-          - bookworm # Debian 12
-          # - trixie # Debian 13
+          # - bullseye # Debian 11
+          # - bookworm # Debian 12
+          - trixie # Debian 13
           # - sid # Debian unstable
         TYPE:
           - minimal
@@ -172,7 +173,7 @@ jobs:
       - name: 下载debs资料
         uses: actions/download-artifact@v4
         with:
-          name: debs-${{ github.event.inputs.BRANCH_TYPE }}
+          name: debs-${{ env.BRANCH_TYPE }}
           path: build/output/debs/
           
       - name: 编译
@@ -184,7 +185,7 @@ jobs:
                 ./compile.sh build \
                   ALLOW_ROOT=yes \
                   BOARD=onecloud \
-                  BRANCH=${{ github.event.inputs.BRANCH_TYPE }} \
+                  BRANCH=${{ env.BRANCH_TYPE }} \
                   RELEASE=${{ matrix.RELEASE }} \
                   KERNEL_CONFIGURE=no \
                   BUILD_MINIMAL=no \
@@ -202,7 +203,7 @@ jobs:
                 ./compile.sh build \
                   ALLOW_ROOT=yes \
                   BOARD=onecloud \
-                  BRANCH=${{ github.event.inputs.BRANCH_TYPE }} \
+                  BRANCH=${{ env.BRANCH_TYPE }} \
                   RELEASE=${{ matrix.RELEASE }} \
                   KERNEL_CONFIGURE=no \
                   BUILD_MINIMAL=${{ matrix.TYPE == 'minimal' && 'yes' || 'no' }} \
