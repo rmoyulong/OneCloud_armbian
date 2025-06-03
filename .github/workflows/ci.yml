@@ -134,7 +134,7 @@ jobs:
           echo "$(echo "${{ needs.prepare.outputs.env }}" | base64 -d)" >>$GITHUB_ENV
 
       - name: Checkout
-        uses: actions/checkout@main
+        uses: actions/checkout@v4
         with:
           repository: ${{ env.ARMBIAN_REPO }}
           ref: ${{ env.ARMBIAN_SHA }}
@@ -201,12 +201,12 @@ jobs:
         TYPE:
           - minimal
           - cli
-          #- desktop
-        #include:
-          #- TYPE: desktop
-            #DESKTOP_ENVIRONMENT: xfce
-            #DESKTOP_ENVIRONMENT_CONFIG_NAME: config_base
-            #DESKTOP_APPGROUPS_SELECTED: ""
+          - desktop
+        include:
+          - TYPE: desktop
+            DESKTOP_ENVIRONMENT: xfce
+            DESKTOP_ENVIRONMENT_CONFIG_NAME: config_base
+            DESKTOP_APPGROUPS_SELECTED: ""
 
     steps:
       - name: Import env
@@ -214,7 +214,7 @@ jobs:
           echo "$(echo "${{ needs.prepare.outputs.env }}" | base64 -d)" >>$GITHUB_ENV
 
       - name: Checkout
-        uses: actions/checkout@main
+        uses: actions/checkout@v4
         with:
           repository: ${{ env.ARMBIAN_REPO }}
           ref: ${{ env.ARMBIAN_SHA }}
