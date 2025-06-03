@@ -29,8 +29,8 @@ jobs:
     outputs:
       env: ${{ steps.get.outputs.env }}
     steps:
-      - name: 检查环境
-        uses: actions/checkout@v4
+      - name: 检查项目
+        uses: actions/checkout@main
 
       - name: 下载最新armbian库
         run: |
@@ -115,6 +115,10 @@ jobs:
           - desktop      
         
     steps:
+      - name: 获得环境变量
+        run: |
+          echo "$(echo "${{ needs.prepare.outputs.env }}" | base64 -d)" >>$GITHUB_ENV
+          
       - name: 清理服务器空间(Ubuntu)
         uses: rmoyulong/free-disk-space@main
         with:
@@ -130,10 +134,6 @@ jobs:
           large-packages: true
           docker-images: true
           swap-storage: true
-
-      - name: 获得环境变量
-        run: |
-          echo "$(echo "${{ needs.prepare.outputs.env }}" | base64 -d)" >>$GITHUB_ENV
           
       - name: 检查项目
         uses: actions/checkout@main
