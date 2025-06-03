@@ -25,9 +25,9 @@ permissions:
 jobs:
   prepare:
     name: Prepare
+    runs-on: ubuntu-latest
     outputs:
       env: ${{ steps.get.outputs.env }}
-    runs-on: ubuntu-latest
     steps:
       - name: 检查环境
         uses: actions/checkout@v4
@@ -41,14 +41,14 @@ jobs:
            export CORE_TAG=${TAG}
            echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
            
-          cat <<EOF | sed -E 's/^  //' >>$GITHUB_ENV
-            TIME=$TIME
-            TAG=$TAG
-            CORE_TAG=$CORE_TAG
-            PATCHES={${PATCHES}}
-            PATCHES_DISABLED={${PATCHES_DISABLED}}
-          EOF
-          echo "env=$(cat $GITHUB_ENV | base64 -w 0)" >>$GITHUB_OUTPUT
+           cat <<EOF | sed -E 's/^  //' >>$GITHUB_ENV
+              TIME=$TIME
+              TAG=$TAG
+              CORE_TAG=$CORE_TAG
+              PATCHES={${PATCHES}}
+              PATCHES_DISABLED={${PATCHES_DISABLED}}
+           EOF
+           echo "env=$(cat $GITHUB_ENV | base64 -w 0)" >>$GITHUB_OUTPUT
            
       - name: 打补丁
         run: |
@@ -155,12 +155,6 @@ jobs:
       - name: 下载最新armbian库
         run: |
            git clone --depth=1 --branch=main https://github.com/armbian/build build
-           
-           TIME="$(curl https://api.github.com/repos/${{ github.repository }}/actions/runs/${GITHUB_RUN_ID} | jq -r .created_at)"
-           TAG="玩客云armbian桌面版-$(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')"
-           export CORE_TAG=${TAG}
-           echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
-           echo ${TAG}
 
       - name: 打补丁
         run: |
