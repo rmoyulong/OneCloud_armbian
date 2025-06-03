@@ -16,9 +16,8 @@ on:
         - edge
 
 env:
-  DESKTOP_ENVIRONMENT: xfce
-  DESKTOP_ENVIRONMENT_CONFIG_NAME: config_base
-  DESKTOP_APPGROUPS_SELECTED: "" 
+  PATCHES: 4077,5076
+  PATCHES_DISABLED: 5082
   
 permissions:
   contents: write
@@ -89,7 +88,21 @@ jobs:
            export CORE_TAG=${TAG}
            echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
            echo ${TAG}          
-           
+
+      - name: 打补丁
+        run: |
+          cd build
+          
+          echo "::group::Download"
+          curl -L -O "https://github.com/armbian/build/pull/{${PATCHES}}.patch"
+          echo "::endgroup::"
+          
+          for file in *.patch; do
+            echo "::group::Applying $file"
+            patch --batch -p1 -N <"$file"
+            echo "::endgroup::"
+          done
+          
       - name: 编译
         run: |
           cd build
@@ -104,9 +117,9 @@ jobs:
                   KERNEL_CONFIGURE=no \
                   BUILD_MINIMAL=no \
                   BUILD_DESKTOP=yes \
-                  DESKTOP_ENVIRONMENT=${{ env.DESKTOP_ENVIRONMENT }} \
-                  DESKTOP_ENVIRONMENT_CONFIG_NAME=${{ env.DESKTOP_ENVIRONMENT_CONFIG_NAME }} \
-                  DESKTOP_APPGROUPS_SELECTED=${{ env.DESKTOP_APPGROUPS_SELECTED }} \
+                  DESKTOP_ENVIRONMENT=xfce \
+                  DESKTOP_ENVIRONMENT_CONFIG_NAME=config_base \
+                  DESKTOP_APPGROUPS_SELECTED="" \
                   EXPERT=yes \
                   SKIP_EXTERNAL_TOOLCHAINS=yes \
                   CLEAN_LEVEL= \

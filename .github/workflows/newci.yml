@@ -82,7 +82,7 @@ jobs:
            export CORE_TAG=${TAG}
            echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
            echo ${TAG}
-           
+          
       - name: 编译
         run: |
           cd build
@@ -99,7 +99,7 @@ jobs:
                   BUILD_DESKTOP=${{ matrix.TYPE == 'desktop' && 'yes' || 'no' }} \
                   DESKTOP_ENVIRONMENT=xfce \
                   DESKTOP_ENVIRONMENT_CONFIG_NAME=config_base \
-                  DESKTOP_APPGROUPS_SELECTED= \
+                  DESKTOP_APPGROUPS_SELECTED="" \
                   EXPERT=yes \
                   SKIP_EXTERNAL_TOOLCHAINS=yes \
                   CLEAN_LEVEL= \
