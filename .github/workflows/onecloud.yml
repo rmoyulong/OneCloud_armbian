@@ -92,23 +92,45 @@ jobs:
       - name: 编译
         run: |
           cd build
-          sudo --preserve-env \
-            ./compile.sh build \
-              ALLOW_ROOT=yes \
-              BOARD=onecloud \
-              BRANCH=${{ github.event.inputs.BRANCH_TYPE }} \
-              RELEASE=${{ matrix.RELEASE }} \
-              KERNEL_CONFIGURE=no \
-              BUILD_MINIMAL=${{ matrix.TYPE == 'minimal' && 'yes' || 'no' }} \
-              BUILD_DESKTOP=${{ matrix.TYPE == 'desktop' && 'yes' || 'no' }} \
-              DESKTOP_ENVIRONMENT=${{ env.DESKTOP_ENVIRONMENT }} \
-              DESKTOP_ENVIRONMENT_CONFIG_NAME=${{ env.DESKTOP_ENVIRONMENT_CONFIG_NAME }} \
-              DESKTOP_APPGROUPS_SELECTED=${{ env.DESKTOP_APPGROUPS_SELECTED }} \
-              EXPERT=yes \
-              SKIP_EXTERNAL_TOOLCHAINS=yes \
-              CLEAN_LEVEL= \
-              USE_CCACHE=no \
-              COMPRESS_OUTPUTIMAGE=img
+          
+          if [[  matrix.TYPE == 'desktop' ]]; then
+              sudo --preserve-env \
+                ./compile.sh build \
+                  ALLOW_ROOT=yes \
+                  BOARD=onecloud \
+                  BRANCH=${{ github.event.inputs.BRANCH_TYPE }} \
+                  RELEASE=${{ matrix.RELEASE }} \
+                  KERNEL_CONFIGURE=no \
+                  BUILD_MINIMAL=${{ matrix.TYPE == 'minimal' && 'yes' || 'no' }} \
+                  BUILD_DESKTOP=${{ matrix.TYPE == 'desktop' && 'yes' || 'no' }} \
+                  DESKTOP_ENVIRONMENT=${{ env.DESKTOP_ENVIRONMENT }} \
+                  DESKTOP_ENVIRONMENT_CONFIG_NAME=${{ env.DESKTOP_ENVIRONMENT_CONFIG_NAME }} \
+                  DESKTOP_APPGROUPS_SELECTED=${{ env.DESKTOP_APPGROUPS_SELECTED }} \
+                  EXPERT=yes \
+                  SKIP_EXTERNAL_TOOLCHAINS=yes \
+                  CLEAN_LEVEL= \
+                  USE_CCACHE=no \
+                  COMPRESS_OUTPUTIMAGE=img
+          else
+              sudo --preserve-env \
+                ./compile.sh build \
+                  ALLOW_ROOT=yes \
+                  BOARD=onecloud \
+                  BRANCH=${{ github.event.inputs.BRANCH_TYPE }} \
+                  RELEASE=${{ matrix.RELEASE }} \
+                  KERNEL_CONFIGURE=no \
+                  BUILD_MINIMAL=${{ matrix.TYPE == 'minimal' && 'yes' || 'no' }} \
+                  BUILD_DESKTOP=${{ matrix.TYPE == 'desktop' && 'yes' || 'no' }} \
+                  DESKTOP_ENVIRONMENT= \
+                  DESKTOP_ENVIRONMENT_CONFIG_NAME= \
+                  DESKTOP_APPGROUPS_SELECTED= \
+                  EXPERT=yes \
+                  SKIP_EXTERNAL_TOOLCHAINS=yes \
+                  CLEAN_LEVEL= \
+                  USE_CCACHE=no \
+                  COMPRESS_OUTPUTIMAGE=img    
+          fi
+          
           sudo chown $(id -u):$(id -g) -R output/
           
       - name: 安装依赖项
