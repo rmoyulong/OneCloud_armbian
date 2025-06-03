@@ -164,7 +164,7 @@ jobs:
         run: |
           cat <<EOF | sed -E 's/^  //' | tee Release.md
             $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
-          EOF          
+          EOF
           
       - name: 提取版本号
         run: |  
