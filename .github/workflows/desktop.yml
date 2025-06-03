@@ -85,18 +85,10 @@ jobs:
            git clone --depth=1 --branch=main https://github.com/armbian/build build
            
            TIME="$(curl https://api.github.com/repos/${{ github.repository }}/actions/runs/${GITHUB_RUN_ID} | jq -r .created_at)"
-           TAG="玩客云armbian桌面版-$(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')"
+           TAG="玩客云armbian最新版-$(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')"
            export CORE_TAG=${TAG}
            echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
-           echo ${TAG}
-           
-           DESKTOP_ENVIRONMENT="xfce"
-           DESKTOP_ENVIRONMENT_CONFIG_NAME="config_base"
-           DESKTOP_APPGROUPS_SELECTED="" 
-           
-           echo "DESKTOP_ENVIRONMENT=$DESKTOP_ENVIRONMENT" >> $GITHUB_ENV
-           echo "DESKTOP_ENVIRONMENT_CONFIG_NAME=$DESKTOP_ENVIRONMENT_CONFIG_NAME" >> $GITHUB_ENV
-           echo "DESKTOP_APPGROUPS_SELECTED=$DESKTOP_APPGROUPS_SELECTED" >> $GITHUB_ENV           
+           echo ${TAG}          
            
       - name: 编译
         run: |

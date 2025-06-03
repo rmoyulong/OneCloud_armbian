@@ -13,11 +13,6 @@ on:
         options:
         - current
         - edge
-
-env:
-  DESKTOP_ENVIRONMENT: xfce
-  DESKTOP_ENVIRONMENT_CONFIG_NAME: config_base
-  DESKTOP_APPGROUPS_SELECTED: "" 
   
 permissions:
   contents: write
@@ -42,8 +37,7 @@ jobs:
           # - sid # Debian unstable
         TYPE:
           - minimal
-          - cli
-          #- desktop      
+          - cli 
         
     steps:
       - name: 清理服务器空间(Ubuntu)
@@ -89,14 +83,6 @@ jobs:
            echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
            echo ${TAG}
            
-           DESKTOP_ENVIRONMENT="xfce"
-           DESKTOP_ENVIRONMENT_CONFIG_NAME="config_base"
-           DESKTOP_APPGROUPS_SELECTED="" 
-           
-           echo "DESKTOP_ENVIRONMENT=$DESKTOP_ENVIRONMENT" >> $GITHUB_ENV
-           echo "DESKTOP_ENVIRONMENT_CONFIG_NAME=$DESKTOP_ENVIRONMENT_CONFIG_NAME" >> $GITHUB_ENV
-           echo "DESKTOP_APPGROUPS_SELECTED=$DESKTOP_APPGROUPS_SELECTED" >> $GITHUB_ENV  
-           
       - name: 编译
         run: |
           cd build
@@ -111,9 +97,9 @@ jobs:
                   KERNEL_CONFIGURE=no \
                   BUILD_MINIMAL=${{ matrix.TYPE == 'minimal' && 'yes' || 'no' }} \
                   BUILD_DESKTOP=${{ matrix.TYPE == 'desktop' && 'yes' || 'no' }} \
-                  DESKTOP_ENVIRONMENT=${{ env.DESKTOP_ENVIRONMENT }} \
-                  DESKTOP_ENVIRONMENT_CONFIG_NAME=${{ env.DESKTOP_ENVIRONMENT_CONFIG_NAME }} \
-                  DESKTOP_APPGROUPS_SELECTED=${{ env.DESKTOP_APPGROUPS_SELECTED }} \
+                  DESKTOP_ENVIRONMENT=xfce \
+                  DESKTOP_ENVIRONMENT_CONFIG_NAME=config_base \
+                  DESKTOP_APPGROUPS_SELECTED= \
                   EXPERT=yes \
                   SKIP_EXTERNAL_TOOLCHAINS=yes \
                   CLEAN_LEVEL= \
