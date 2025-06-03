@@ -25,7 +25,7 @@ permissions:
 jobs:
   prepare:
     name: Prepare
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       env: ${{ steps.get.outputs.env }}
     steps:
@@ -39,8 +39,7 @@ jobs:
            TIME="$(curl https://api.github.com/repos/${{ github.repository }}/actions/runs/${GITHUB_RUN_ID} | jq -r .created_at)"
            TAG="玩客云armbian桌面版-$(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')"
            export CORE_TAG=${TAG}
-           echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
-           
+          
            cat <<EOF | sed -E 's/^  //' >>$GITHUB_ENV
               TIME=$TIME
               TAG=$TAG
@@ -81,7 +80,7 @@ jobs:
       - name: 上传资料
         uses: actions/upload-artifact@v4
         with:
-          name: debs-${{ github.event.inputs.BRANCH_TYPE }
+          name: debs-${{ github.event.inputs.BRANCH_TYPE }}
           path: build/output/debs/*
 
       - name: 上传标签
@@ -173,7 +172,7 @@ jobs:
       - name: 下载debs资料
         uses: actions/download-artifact@v4
         with:
-          name: debs-${{ github.event.inputs.BRANCH_TYPE }
+          name: debs-${{ github.event.inputs.BRANCH_TYPE }}
           path: build/output/debs/
           
       - name: 编译
