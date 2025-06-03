@@ -23,9 +23,67 @@ permissions:
   contents: write
   
 jobs:
+  build-debs:
+    name: 初始化编译-${{ github.event.inputs.BRANCH_TYPE }}
+    runs-on: ubuntu-22.04
+
+      - name: 检查环境
+        uses: actions/checkout@v4
+
+      - name: 下载最新armbian库
+        run: |
+           git clone --depth=1 --branch=main https://github.com/armbian/build build
+           
+           TIME="$(curl https://api.github.com/repos/${{ github.repository }}/actions/runs/${GITHUB_RUN_ID} | jq -r .created_at)"
+           TAG="玩客云armbian最新版-$(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')"
+           export CORE_TAG=${TAG}
+           echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
+           echo ${TAG} 
+           
+      - name: 打补丁
+        run: |
+          cd build
+          
+          echo "::group::Download"
+          curl -L -O "https://github.com/armbian/build/pull/{${PATCHES}}.patch"
+          echo "::endgroup::"
+          
+          for file in *.patch; do
+            echo "::group::Applying $file"
+            patch --batch -p1 -N <"$file"
+            echo "::endgroup::"
+          done
+
+      - name: 预编译
+        run: |
+          # Don't update remote cache
+          cd build  
+          export GITHUB_ACTIONS=false
+          sudo --preserve-env \
+            ./compile.sh kernel \
+              ALLOW_ROOT=yes \
+              BOARD=onecloud \
+              BRANCH=${{ github.event.inputs.BRANCH_TYPE }} \
+              EXPERT=yes \
+              USE_CCACHE=no
+          sudo chown $(id -u):$(id -g) -R output/
+
+      - name: 上传资料
+        uses: actions/upload-artifact@v4
+        with:
+          name: debs-${{ matrix.BRANCH }}
+          path: build/output/debs/*
+
+      - name: 上传标签
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG }}
+          files: |
+            build/output/debs/*
+
   build_armbian_firmware:
     name:  编译-${{ github.event.inputs.BRANCH_TYPE }}_${{ matrix.TYPE }}_${{ matrix.RELEASE }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
@@ -87,7 +145,7 @@ jobs:
            TAG="玩客云armbian最新版-$(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')"
            export CORE_TAG=${TAG}
            echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
-           echo ${TAG}          
+           echo ${TAG}
 
       - name: 打补丁
         run: |
@@ -102,11 +160,17 @@ jobs:
             patch --batch -p1 -N <"$file"
             echo "::endgroup::"
           done
+
+      - name: 下载debs资料
+        uses: actions/download-artifact@v4
+        with:
+          name: debs-${{ matrix.BRANCH }}
+          path: build/output/debs/
           
       - name: 编译
         run: |
           cd build
-          
+          export GITHUB_ACTIONS=false
           if [[  "matrix.TYPE" == "*desktop*" ]]; then
               sudo --preserve-env \
                 ./compile.sh build \
