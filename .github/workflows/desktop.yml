@@ -90,6 +90,14 @@ jobs:
            echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
            echo ${TAG}
            
+           DESKTOP_ENVIRONMENT="xfce"
+           DESKTOP_ENVIRONMENT_CONFIG_NAME="config_base"
+           DESKTOP_APPGROUPS_SELECTED="" 
+           
+           echo "DESKTOP_ENVIRONMENT=$DESKTOP_ENVIRONMENT" >> $GITHUB_ENV
+           echo "DESKTOP_ENVIRONMENT_CONFIG_NAME=$DESKTOP_ENVIRONMENT_CONFIG_NAME" >> $GITHUB_ENV
+           echo "DESKTOP_APPGROUPS_SELECTED=$DESKTOP_APPGROUPS_SELECTED" >> $GITHUB_ENV           
+           
       - name: 编译
         run: |
           cd build
@@ -102,8 +110,8 @@ jobs:
                   BRANCH=${{ github.event.inputs.BRANCH_TYPE }} \
                   RELEASE=${{ matrix.RELEASE }} \
                   KERNEL_CONFIGURE=no \
-                  BUILD_MINIMAL=${{ matrix.TYPE == 'minimal' && 'yes' || 'no' }} \
-                  BUILD_DESKTOP=${{ matrix.TYPE == 'desktop' && 'yes' || 'no' }} \
+                  BUILD_MINIMAL=no \
+                  BUILD_DESKTOP=yes \
                   DESKTOP_ENVIRONMENT=${{ env.DESKTOP_ENVIRONMENT }} \
                   DESKTOP_ENVIRONMENT_CONFIG_NAME=${{ env.DESKTOP_ENVIRONMENT_CONFIG_NAME }} \
                   DESKTOP_APPGROUPS_SELECTED=${{ env.DESKTOP_APPGROUPS_SELECTED }} \
