@@ -30,7 +30,7 @@ jobs:
       env: ${{ steps.get.outputs.env }}
     steps:
       - id: get
-        name: name: 下载最新armbian库
+        name: 下载最新armbian库
         run: |
            git clone --depth=1 --branch=main https://github.com/armbian/build build
            
