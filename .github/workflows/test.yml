@@ -72,6 +72,7 @@ jobs:
         run: |
            echo "CORE_TAG=${{ needs.prepare.outputs.CORE_TAG }}" >>$GITHUB_ENV
            echo ${{ env.CORE_TAG }}
+           echo ${{ needs.prepare.outputs.CORE_TAG }}
           
            TIME="$(curl https://api.github.com/repos/${{ github.repository }}/actions/runs/${GITHUB_RUN_ID} | jq -r .created_at)"
            TAG="玩客云armbian桌面版-$(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')"
