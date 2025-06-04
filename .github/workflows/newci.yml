@@ -28,7 +28,7 @@ jobs:
     name: Prepare
     runs-on: ubuntu-latest
     outputs:
-      env: ${{ steps.get.outputs.env }}
+      CORE_TAG: ${{ steps.get.outputs.CORE_TAG }}
     steps:
       - id: get
         name: 下载最新armbian库
@@ -42,8 +42,7 @@ jobs:
            
            echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
            echo "CORE_TAG=$CORE_TAG" >> $GITHUB_OUTPUT
-           echo ${{ env.CORE_TAG }}         
-           
+           echo ${{ env.CORE_TAG }}
            
       - name: 打补丁
         run: |
@@ -96,12 +95,12 @@ jobs:
         RELEASE:
           # - focal # Ubuntu 20.04 LTS
           # - jammy # Ubuntu 22.04 LTS
-          # - noble # Ubuntu 24.04 LTS
-          # - oracular # Ubuntu 24.10
+          #- noble # Ubuntu 24.04 LTS
+          #- oracular # Ubuntu 24.10
           - plucky # Ubuntu 25.04
-          # - buster # Debian 10
-          # - bullseye # Debian 11
-          # - bookworm # Debian 12
+          #- buster # Debian 10
+          #- bullseye # Debian 11
+          #- bookworm # Debian 12
           - trixie # Debian 13
           # - sid # Debian unstable
         TYPE:
@@ -116,7 +115,6 @@ jobs:
            echo ${{ env.CORE_TAG }}
            echo ${{ needs.prepare.outputs.CORE_TAG }}
           
-           
       - name: 清理服务器空间(Ubuntu)
         uses: rmoyulong/free-disk-space@main
         with:
@@ -171,7 +169,7 @@ jobs:
       - name: 下载debs资料
         uses: actions/download-artifact@v4
         with:
-          name:debs-${{ github.event.inputs.BRANCH_TYPE }}
+          name: debs-${{ github.event.inputs.BRANCH_TYPE }}
           path: build/output/debs/
           
       - name: 编译
