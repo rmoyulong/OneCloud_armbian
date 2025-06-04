@@ -40,7 +40,7 @@ jobs:
            TAG="玩客云armbian最新版-$(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')"
            export CORE_TAG=${TAG}
           
-           cat <<EOF | sed -E 's/^  //' >>$GITHUB_ENV
+           cat <<EOF >>$GITHUB_ENV
               TIME=$TIME
               TAG=$TAG
               CORE_TAG=$CORE_TAG
@@ -48,7 +48,9 @@ jobs:
               PATCHES_DISABLED={${PATCHES_DISABLED}}
               BRANCH_TYPE=${{ github.event.inputs.BRANCH_TYPE }}
            EOF
-           echo "env=$(cat $GITHUB_ENV | base64 -w 0)" >>$GITHUB_OUTPUT
+           echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
+           echo "env=$(cat $GITHUB_ENV | base64 -w 0)" >>$GITHUB_OUTPUT           
+           
            
       - name: 打补丁
         run: |
@@ -118,7 +120,7 @@ jobs:
       - name: 获得环境变量
         run: |
           echo "$(echo "${{ needs.prepare.outputs.env }}" | base64 -d)" >>$GITHUB_ENV
-          
+           
       - name: 清理服务器空间(Ubuntu)
         uses: rmoyulong/free-disk-space@main
         with:
