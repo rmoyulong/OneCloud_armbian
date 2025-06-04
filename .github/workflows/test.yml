@@ -1,0 +1,84 @@
+name: 玩客云armbain测试脚本
+#desktop版本6.12内核只有noble、oracular、plucky、bullseye、bookworm编译成功
+
+on:
+  #对应的是 UTC 时间，需要转换，0 代表北京时间8点，每个月1日/15日12点编译一次
+  #关闭则手动编译
+  workflow_dispatch:
+    inputs:
+      BRANCH_TYPE:
+        description: '分支类型'     
+        required: false
+        default: 'current' 
+        type: choice
+        options:
+        - current
+        - edge
+
+env:
+  PATCHES: 4077,5076
+  PATCHES_DISABLED: 5082
+  
+permissions:
+  contents: write
+  
+jobs:
+  prepare:
+    name: Prepare
+    runs-on: ubuntu-latest
+    outputs:
+      env: ${{ steps.get.outputs.env }}
+    steps:
+      - id: get
+        name: 下载最新armbian库
+        run: |
+           #git clone --depth=1 --branch=main https://github.com/armbian/build build
+           
+           TIME="$(curl https://api.github.com/repos/${{ github.repository }}/actions/runs/${GITHUB_RUN_ID} | jq -r .created_at)"
+           TAG="玩客云armbian桌面版-$(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')"
+           export CORE_TAG=${TAG}
+          
+           cat <<EOF | sed -E 's/^  //' >>$GITHUB_ENV
+              TIME=$TIME
+              TAG=$TAG
+              CORE_TAG=$CORE_TAG
+              PATCHES={${PATCHES}}
+              PATCHES_DISABLED={${PATCHES_DISABLED}}
+              BRANCH_TYPE=${{ github.event.inputs.BRANCH_TYPE }}
+           EOF
+           echo "env=$(cat $GITHUB_ENV | base64 -w 0)" >>$GITHUB_OUTPUT
+           echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
+           
+  build_armbian_firmware:
+    name:  编译-${{ matrix.TYPE }}_${{ matrix.RELEASE }}
+    needs: prepare
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        RELEASE:
+          # - focal # Ubuntu 20.04 LTS
+          # - jammy # Ubuntu 22.04 LTS
+          # - noble # Ubuntu 24.04 LTS
+          - oracular # Ubuntu 24.10
+          #- plucky # Ubuntu 25.04
+          # - buster # Debian 10
+          #- bullseye # Debian 11
+          - bookworm # Debian 12
+          # - trixie # Debian 13
+          # - sid # Debian unstable
+        TYPE:
+          #- minimal
+          #- cli
+          - desktop      
+        
+    steps:
+      - name: 获得环境变量
+        run: |
+          echo "$(echo "${{ needs.prepare.outputs.env }}" | base64 -d)" >>$GITHUB_ENV
+          export DOWN_TAG="debs-${{ needs.prepare.outputs.env.BRANCH_TYPE }}"
+          echo $DOWN_TAG
+          echo "DOWN_TAG=$DOWN_TAG" >> $GITHUB_ENV
+          echo ${{ needs.prepare.env.CORE_TAG }}
+          
+
