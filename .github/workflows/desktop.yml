@@ -176,7 +176,7 @@ jobs:
         run: |
           cd build
           export GITHUB_ACTIONS=false
-          if [[  "matrix.TYPE" == "*desktop*" ]]; then
+          if [[  "${{ matrix.TYPE }}"== "*desktop*" ]]; then
               sudo --preserve-env \
                 ./compile.sh build \
                   ALLOW_ROOT=yes \
@@ -188,7 +188,7 @@ jobs:
                   BUILD_DESKTOP=yes \
                   DESKTOP_ENVIRONMENT=xfce \
                   DESKTOP_ENVIRONMENT_CONFIG_NAME=config_base \
-                  DESKTOP_APPGROUPS_SELECTED="" \
+                  DESKTOP_APPGROUPS_SELECTED= \
                   EXPERT=yes \
                   SKIP_EXTERNAL_TOOLCHAINS=yes \
                   CLEAN_LEVEL= \
