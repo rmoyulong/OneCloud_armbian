@@ -106,7 +106,7 @@ jobs:
         TYPE:
           - minimal
           - cli
-          #- desktop      
+          #- desktop
         
     steps:
       - name: 获得环境变量
@@ -176,7 +176,7 @@ jobs:
         run: |
           cd build
           export GITHUB_ACTIONS=false
-          if [[  "${{ matrix.TYPE }}"== "*desktop*" ]]; then
+          if [[  "${{ matrix.TYPE }}"== "desktop" ]]; then
               sudo --preserve-env \
                 ./compile.sh build \
                   ALLOW_ROOT=yes \
@@ -282,9 +282,10 @@ jobs:
           echo "version=$version" >> $GITHUB_ENV
           
       - name: 生成标签，上传固件
-        uses: ncipollo/release-action@main
+        uses: softprops/action-gh-release@v2
         with:
-          allowUpdates: true
-          tag: ${{ needs.prepare.outputs.CORE_TAG }}
-          artifacts: build/output/images/*
-          bodyFile: Release.md          
+          tag_name:${{ needs.prepare.outputs.CORE_TAG }}
+          append_body: true
+          body_path: Release.md
+          files: |
+            build/output/images/*        
