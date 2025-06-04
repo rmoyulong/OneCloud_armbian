@@ -28,7 +28,10 @@ jobs:
     name: Prepare
     runs-on: ubuntu-latest
     outputs:
-      env: ${{ steps.get.outputs.env }}
+      TIME: ${{ steps.get.outputs.TIME }}
+      TAG: ${{ steps.get.outputs.TAG }}
+      CORE_TAG: ${{ steps.get.outputs.CORE_TAG }}
+      DOWN_TAG: ${{ steps.get.outputs.DOWN_TAG }}
     steps:
       - id: get
         name: 下载最新armbian库
