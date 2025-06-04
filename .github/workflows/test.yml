@@ -79,9 +79,9 @@ jobs:
         run: |
           echo "$(echo "${{ needs.prepare.outputs.env }}" | base64 -d)" >>$GITHUB_ENV
           export DOWN_TAG="debs-${{ env.BRANCH_TYPE }}"
-          echo $DOWN_TAG
+          echo "1:"$DOWN_TAG
           echo "DOWN_TAG=$DOWN_TAG" >> $GITHUB_ENV
-          echo ${{ env.CORE_TAG }}
-          echo ${{ env.DOWN_TAG }}
+          echo "2:prepare-"${{ prepare.outputs.env.CORE_TAG }}
+          echo "3:"${{ env.DOWN_TAG }}
           
 
