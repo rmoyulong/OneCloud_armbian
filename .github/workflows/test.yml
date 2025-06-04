@@ -28,11 +28,7 @@ jobs:
     name: Prepare
     runs-on: ubuntu-latest
     outputs:
-      TIME: ${{ steps.get.outputs.TIME }}
-      TAG: ${{ steps.get.outputs.TAG }}
       CORE_TAG: ${{ steps.get.outputs.CORE_TAG }}
-      DOWN_TAG: ${{ steps.get.outputs.DOWN_TAG }}
-      BRANCH_TYPE: ${{ steps.get.outputs.BRANCH_TYPE }}
     steps:
       - id: get
         name: 下载最新armbian库
@@ -43,17 +39,9 @@ jobs:
            TAG="玩客云armbian桌面版-$(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')"
            export CORE_TAG=${TAG}
            
-           echo "TIME=$TIME" >> $GITHUB_ENV
-           echo "TAG=$TAG" >> $GITHUB_ENV
            echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
-           echo "BRANCH_TYPE=${{ env.BRANCH_TYPE }}" >> $GITHUB_ENV
-           echo "DOWN_TAG="debs-${{ env.BRANCH_TYPE }}" >> $GITHUB_ENV
-           
-           echo "TIME=$TIME" >> $GITHUB_OUTPUT
-           echo "TAG=$TAG" >> $GITHUB_OUTPUT
            echo "CORE_TAG=$CORE_TAG" >> $GITHUB_OUTPUT
-           echo "BRANCH_TYPE=${{ env.BRANCH_TYPE }}" >> $GITHUB_OUTPUT
-           echo "DOWN_TAG="debs-${{ env.BRANCH_TYPE }}" >> $GITHUB_OUTPUT
+           echo ${{ env.CORE_TAG }}
            
   build_armbian_firmware:
     name:  编译-${{ matrix.TYPE }}_${{ matrix.RELEASE }}
@@ -81,15 +69,13 @@ jobs:
     steps:
       - name: 获得环境变量
         run: |
-          echo "TIME=${{ needs.prepare.outputs.TIME }}" >>$GITHUB_ENV
-          echo "TAG=${{ needs.prepare.outputs.TAG }}" >>$GITHUB_ENV
-          echo "CORE_TAG=${{ needs.prepare.outputs.CORE_TAG }}" >>$GITHUB_ENV
-          echo "BRANCH_TYPE=${{ needs.prepare.outputs.BRANCH_TYPE }}" >>$GITHUB_ENV
           echo "DOWN_TAG=${{ needs.prepare.outputs.DOWN_TAG }}" >>$GITHUB_ENV
           
-          echo "1:DOWN_TAG" 
-          echo ${{ env.DOWN_TAG }}
-          echo "2:CORE_TAG" 
-          echo ${{ env.CORE_TAG }}
-          echo "3:BRANCH_TYPE" 
-          echo ${{ env.BRANCH_TYPE }}
+           TIME="$(curl https://api.github.com/repos/${{ github.repository }}/actions/runs/${GITHUB_RUN_ID} | jq -r .created_at)"
+           TAG="玩客云armbian桌面版-$(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')"
+           export CORE_TAG=${TAG}
+           
+           echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
+           echo ${{ env.CORE_TAG }}
+           
+           echo ${{ env.DOWN_TAG }}
