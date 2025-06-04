@@ -117,6 +117,9 @@ jobs:
       - name: 获得环境变量
         run: |
           echo "$(echo "${{ needs.prepare.outputs.env }}" | base64 -d)" >>$GITHUB_ENV
+          export DOWN_TAG="debs-${{ env.BRANCH_TYPE }}"
+          echo $DOWN_TAG
+          echo "DOWN_TAG=$DOWN_TAG" >> $GITHUB_ENV
           
       - name: 清理服务器空间(Ubuntu)
         uses: rmoyulong/free-disk-space@main
@@ -172,7 +175,7 @@ jobs:
       - name: 下载debs资料
         uses: actions/download-artifact@v4
         with:
-          name: debs-${{ env.BRANCH_TYPE }}
+          name: ${{ env.DOWN_TAG }}
           path: build/output/debs/
           
       - name: 编译
