@@ -79,11 +79,11 @@ jobs:
           path: build/output/debs/*
 
       - name: 上传标签
-        uses: softprops/action-gh-release@v2
+        uses: ncipollo/release-action@main
         with:
-          tag_name: ${{ env.CORE_TAG }}
-          files: |
-            build/output/debs/*
+          allowUpdates: true
+          tag: ${{ env.CORE_TAG }}
+          artifacts: build/output/debs/*
 
   build_armbian_firmware:
     name:  编译-${{ matrix.TYPE }}_${{ matrix.RELEASE }}
@@ -282,10 +282,9 @@ jobs:
           echo "version=$version" >> $GITHUB_ENV
           
       - name: 生成标签，上传固件
-        uses: softprops/action-gh-release@v2
+        uses: ncipollo/release-action@main
         with:
-          tag_name: ${{ needs.prepare.outputs.CORE_TAG }}
-          append_body: true
-          body_path: Release.md
-          files: |
-            build/output/images/*
+          allowUpdates: true
+          tag: ${{ needs.prepare.outputs.CORE_TAG }}
+          artifacts: build/output/images/*
+          bodyFile: Release.md 
