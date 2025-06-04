@@ -85,8 +85,8 @@ jobs:
           echo ${DOWN_TAG}
           echo "DOWN_TAG=$DOWN_TAG" >> $GITHUB_ENV
           echo "2:prepare-" 
-          echo ${{ prepare.env.CORE_TAG }}
+          echo ${{ env.TAG }}
           echo "3:" 
-          echo ${{ build_armbian_firmware.env.DOWN_TAG }}
+          echo ${{ env.DOWN_TAG }}
           
 
