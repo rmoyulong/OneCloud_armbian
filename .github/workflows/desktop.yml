@@ -176,7 +176,7 @@ jobs:
         run: |
           cd build
           export GITHUB_ACTIONS=false
-          if [[  "${{ matrix.TYPE }}"== ""desktop"* ]]; then
+          if [[  "${{ matrix.TYPE }}"== *"desktop"* ]]; then
               sudo ./compile.sh build \
                   ALLOW_ROOT=yes \
                   BOARD=onecloud \
