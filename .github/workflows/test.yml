@@ -83,7 +83,7 @@ jobs:
           echo ${DOWN_TAG}
           echo "DOWN_TAG=$DOWN_TAG" >> $GITHUB_ENV
           echo "2:prepare-" 
-          echo ${{ prepare.env.CORE_TAG }}
+          echo ${{ needs.prepare.env.CORE_TAG }}
           echo "3:" 
           echo ${{ env.DOWN_TAG }}"
           
