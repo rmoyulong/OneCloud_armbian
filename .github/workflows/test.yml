@@ -87,6 +87,6 @@ jobs:
           echo "2:prepare-" 
           echo ${{ env.CORE_TAG }}
           echo "3:" 
-          echo ${{ env.DOWN_TAG }}"
+          echo ${{ env.DOWN_TAG }}
           
 
