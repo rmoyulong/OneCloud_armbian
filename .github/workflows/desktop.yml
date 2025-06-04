@@ -18,6 +18,7 @@ on:
 env:
   PATCHES: 4077,5076
   PATCHES_DISABLED: 5082
+  BRANCH_TYPE: ${{ github.event.inputs.BRANCH_TYPE }}
   
 permissions:
   contents: write
@@ -27,7 +28,7 @@ jobs:
     name: Prepare
     runs-on: ubuntu-latest
     outputs:
-      env: ${{ steps.get.outputs.env }}
+      CORE_TAG: ${{ steps.get.outputs.CORE_TAG }}
     steps:
       - id: get
         name: 下载最新armbian库
@@ -37,17 +38,11 @@ jobs:
            TIME="$(curl https://api.github.com/repos/${{ github.repository }}/actions/runs/${GITHUB_RUN_ID} | jq -r .created_at)"
            TAG="玩客云armbian桌面版-$(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')"
            export CORE_TAG=${TAG}
-          
-           cat <<EOF | sed -E 's/^  //' >>$GITHUB_ENV
-              TIME=$TIME
-              TAG=$TAG
-              CORE_TAG=$CORE_TAG
-              PATCHES={${PATCHES}}
-              PATCHES_DISABLED={${PATCHES_DISABLED}}
-              BRANCH_TYPE=${{ github.event.inputs.BRANCH_TYPE }}
-           EOF
-           echo "env=$(cat $GITHUB_ENV | base64 -w 0)" >>$GITHUB_OUTPUT
+           echo $CORE_TAG
+           
            echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
+           echo "CORE_TAG=$CORE_TAG" >> $GITHUB_OUTPUT
+           echo ${{ env.CORE_TAG }}
            
       - name: 打补丁
         run: |
@@ -116,10 +111,9 @@ jobs:
     steps:
       - name: 获得环境变量
         run: |
-          echo "$(echo "${{ needs.prepare.outputs.env }}" | base64 -d)" >>$GITHUB_ENV
-          export DOWN_TAG="debs-${{ env.BRANCH_TYPE }}"
-          echo $DOWN_TAG
-          echo "DOWN_TAG=$DOWN_TAG" >> $GITHUB_ENV
+           echo "CORE_TAG=${{ needs.prepare.outputs.CORE_TAG }}" >>$GITHUB_ENV
+           echo ${{ env.CORE_TAG }}
+           echo ${{ needs.prepare.outputs.CORE_TAG }}
           
       - name: 清理服务器空间(Ubuntu)
         uses: rmoyulong/free-disk-space@main
@@ -175,7 +169,7 @@ jobs:
       - name: 下载debs资料
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.DOWN_TAG }}
+          name: debs-${{ github.event.inputs.BRANCH_TYPE }}
           path: build/output/debs/
           
       - name: 编译
@@ -290,7 +284,7 @@ jobs:
       - name: 生成标签，上传固件
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.CORE_TAG }}
+          tag_name: ${{ needs.prepare.outputs.CORE_TAG }}
           append_body: true
           body_path: Release.md
           files: |
