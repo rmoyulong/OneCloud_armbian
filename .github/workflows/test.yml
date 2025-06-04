@@ -18,6 +18,8 @@ on:
 env:
   PATCHES: 4077,5076
   PATCHES_DISABLED: 5082
+  BRANCH_TYPE: ${{ github.event.inputs.BRANCH_TYPE }}
+  CORE_TAG: test
   
 permissions:
   contents: write
@@ -44,7 +46,7 @@ jobs:
               CORE_TAG=$CORE_TAG
               PATCHES={${PATCHES}}
               PATCHES_DISABLED={${PATCHES_DISABLED}}
-              BRANCH_TYPE=${{ github.event.inputs.BRANCH_TYPE }}
+              BRANCH_TYPE=${{ env.BRANCH_TYPE }}
            EOF
            echo "env=$(cat $GITHUB_ENV | base64 -w 0)" >>$GITHUB_OUTPUT
            echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
@@ -76,9 +78,10 @@ jobs:
       - name: 获得环境变量
         run: |
           echo "$(echo "${{ needs.prepare.outputs.env }}" | base64 -d)" >>$GITHUB_ENV
-          export DOWN_TAG="debs-${{ needs.prepare.outputs.env.BRANCH_TYPE }}"
+          export DOWN_TAG="debs-${{ env.BRANCH_TYPE }}"
           echo $DOWN_TAG
           echo "DOWN_TAG=$DOWN_TAG" >> $GITHUB_ENV
-          echo ${{ needs.prepare.env.CORE_TAG }}
+          echo ${{ env.CORE_TAG }}
+          echo ${{ env.DOWN_TAG }}
           
 
