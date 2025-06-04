@@ -1,5 +1,5 @@
 name: 玩客云armbain最新版
-#desktop版本6.12内核只有noble、oracular、plucky、bullseye、bookworm编译成功
+#desktop版本6.12内核只有noble、oracular、plucky、bookworm编译成功
 
 on:
   #对应的是 UTC 时间，需要转换，0 代表北京时间8点，每个月1日/15日12点编译一次
