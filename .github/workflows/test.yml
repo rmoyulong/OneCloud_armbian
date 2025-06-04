@@ -38,6 +38,7 @@ jobs:
            TIME="$(curl https://api.github.com/repos/${{ github.repository }}/actions/runs/${GITHUB_RUN_ID} | jq -r .created_at)"
            TAG="玩客云armbian桌面版-$(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')"
            export CORE_TAG=${TAG}
+           echo $CORE_TAG
            
            echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
            echo "CORE_TAG=$CORE_TAG" >> $GITHUB_OUTPUT
@@ -69,13 +70,12 @@ jobs:
     steps:
       - name: 获得环境变量
         run: |
-          echo "DOWN_TAG=${{ needs.prepare.outputs.DOWN_TAG }}" >>$GITHUB_ENV
+           echo "CORE_TAG=${{ needs.prepare.outputs.CORE_TAG }}" >>$GITHUB_ENV
           
            TIME="$(curl https://api.github.com/repos/${{ github.repository }}/actions/runs/${GITHUB_RUN_ID} | jq -r .created_at)"
            TAG="玩客云armbian桌面版-$(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')"
            export CORE_TAG=${TAG}
+           echo $CORE_TAG
            
            echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
            echo ${{ env.CORE_TAG }}
-           
-           echo ${{ env.DOWN_TAG }}
