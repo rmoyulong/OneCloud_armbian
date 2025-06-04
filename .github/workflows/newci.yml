@@ -176,9 +176,8 @@ jobs:
         run: |
           cd build
           export GITHUB_ACTIONS=false
-          if [[  "${{ matrix.TYPE }}"== "desktop" ]]; then
-              sudo --preserve-env \
-                ./compile.sh build \
+          if [[  "${{ matrix.TYPE }}"== *"desktop"* ]]; then
+              sudo ./compile.sh build \
                   ALLOW_ROOT=yes \
                   BOARD=onecloud \
                   BRANCH=${{ env.BRANCH_TYPE }} \
@@ -195,8 +194,7 @@ jobs:
                   USE_CCACHE=no \
                   COMPRESS_OUTPUTIMAGE=img
           else
-              sudo --preserve-env \
-                ./compile.sh build \
+              sudo ./compile.sh build \
                   ALLOW_ROOT=yes \
                   BOARD=onecloud \
                   BRANCH=${{ env.BRANCH_TYPE }} \
