@@ -1,5 +1,5 @@
 name: 玩客云armbain最新版
-#6.12内核只有noble、oracular、plucky、bullseye、bookworm编译成功
+#desktop版本6.12内核只有noble、oracular、plucky、bullseye、bookworm编译成功
 
 on:
   #对应的是 UTC 时间，需要转换，0 代表北京时间8点，每个月1日/15日12点编译一次
@@ -29,10 +29,8 @@ jobs:
     outputs:
       env: ${{ steps.get.outputs.env }}
     steps:
-      - name: 检查项目
-        uses: actions/checkout@main
-
-      - name: 下载最新armbian库
+      - id: get
+        name: name: 下载最新armbian库
         run: |
            git clone --depth=1 --branch=main https://github.com/armbian/build build
            
@@ -40,7 +38,7 @@ jobs:
            TAG="玩客云armbian最新版-$(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')"
            export CORE_TAG=${TAG}
           
-           cat <<EOF >>$GITHUB_ENV
+           cat <<EOF | sed -E 's/^  //' >>$GITHUB_ENV
               TIME=$TIME
               TAG=$TAG
               CORE_TAG=$CORE_TAG
@@ -48,8 +46,8 @@ jobs:
               PATCHES_DISABLED={${PATCHES_DISABLED}}
               BRANCH_TYPE=${{ github.event.inputs.BRANCH_TYPE }}
            EOF
-           echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
-           echo "env=$(cat $GITHUB_ENV | base64 -w 0)" >>$GITHUB_OUTPUT           
+           echo "env=$(cat $GITHUB_ENV | base64 -w 0)" >>$GITHUB_OUTPUT
+           echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV         
            
            
       - name: 打补丁
