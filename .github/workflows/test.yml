@@ -80,11 +80,11 @@ jobs:
     steps:
       - name: 获得环境变量
         run: |
-          echo "$(echo "${{ needs.prepare.outputs.DOWN_TAG }}" >>$GITHUB_ENV
-          echo "$(echo "${{ needs.prepare.outputs.CORE_TAG }}" >>$GITHUB_ENV
-          echo "$(echo "${{ needs.prepare.outputs.BRANCH_TYPE }}" >>$GITHUB_ENV
-          echo "$(echo "${{ needs.prepare.outputs.TIME }}" >>$GITHUB_ENV
-          echo "$(echo "${{ needs.prepare.outputs.TAG }}" >>$GITHUB_ENV
+          echo "$(echo "${{ needs.prepare.outputs.DOWN_TAG }})" >>$GITHUB_ENV
+          echo "$(echo "${{ needs.prepare.outputs.CORE_TAG }})" >>$GITHUB_ENV
+          echo "$(echo "${{ needs.prepare.outputs.BRANCH_TYPE }})" >>$GITHUB_ENV
+          echo "$(echo "${{ needs.prepare.outputs.TIME }})" >>$GITHUB_ENV
+          echo "$(echo "${{ needs.prepare.outputs.TAG }})" >>$GITHUB_ENV
           
           echo "1:DOWN_TAG" 
           echo ${{ env.DOWN_TAG }}
