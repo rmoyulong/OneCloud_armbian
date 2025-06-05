@@ -52,10 +52,10 @@ jobs:
 
     outputs:
       CORE_TAG: ${{ steps.get.outputs.CORE_TAG }} 
-      BRANCH: ${{ env.BRANCH_TYPE }}
+      BRANCH: ${{ github.event.inputs.BRANCH_TYPE }}
       
   build_armbian_firmware:
-    name:  编译-${{ env.BRANCH_TYPE }}-${{ matrix.TYPE }}_${{ matrix.RELEASE }}
+    name:  编译-${{ needs.prepare.outputs.BRANCH }}-${{ matrix.TYPE }}_${{ matrix.RELEASE }}
     needs: prepare
     runs-on: ubuntu-latest
     strategy:
