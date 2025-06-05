@@ -82,4 +82,3 @@ jobs:
         run: |
            echo ${{ needs.prepare.outputs.BRANCH }}-"${{ matrix.RELEASE }}"-"${{ matrix.TYPE }}"
            echo ${{ needs.prepare.outputs.CORE_TAG }}
-}
