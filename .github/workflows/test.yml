@@ -27,15 +27,21 @@ jobs:
   prepare:
     name: Prepare
     runs-on: ubuntu-latest
-    outputs:
-      CORE_TAG: ${{ steps.get.outputs.CORE_TAG }}
     steps:
-      - id: get
-        name: 下载最新armbian库
+      - name: Get Time
+        id: time
+        uses: nanzm/get-time-action@master
+        with:
+          timeZone: Asia/Shanghai
+          format: 'YYYY-MM-DD-HH:mm:ss'
+          
+      - name: 下载最新armbian库
+        id: get
         run: |
            #git clone --depth=1 --branch=main https://github.com/armbian/build build
            
-           TIME="$(curl https://api.github.com/repos/${{ github.repository }}/actions/runs/${GITHUB_RUN_ID} | jq -r .created_at)"
+           #TIME="$(curl https://api.github.com/repos/${{ github.repository }}/actions/runs/${GITHUB_RUN_ID} | jq -r .created_at)"
+           TIME=${{ steps.time.outputs.time }}
            TAG="玩客云armbian桌面版-$(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')"
            export CORE_TAG=${TAG}
            echo $CORE_TAG
@@ -43,6 +49,10 @@ jobs:
            echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
            echo "CORE_TAG=$CORE_TAG" >> $GITHUB_OUTPUT
            echo ${{ env.CORE_TAG }}
+
+    outputs:
+      CORE_TAG: ${{ steps.get.outputs.CORE_TAG }} 
+      BRANCH: ${{ env.BRANCH_TYPE }}      
            
   build_armbian_firmware:
     name:  编译-${{ matrix.TYPE }}_${{ matrix.RELEASE }}
@@ -70,14 +80,6 @@ jobs:
     steps:
       - name: 获得环境变量
         run: |
-           echo "CORE_TAG=${{ needs.prepare.outputs.CORE_TAG }}" >>$GITHUB_ENV
-           echo ${{ env.CORE_TAG }}
+           echo ${{ needs.prepare.outputs.BRANCH }}-"${{ matrix.RELEASE }}"-"${{ matrix.TYPE }}"
            echo ${{ needs.prepare.outputs.CORE_TAG }}
-          
-           TIME="$(curl https://api.github.com/repos/${{ github.repository }}/actions/runs/${GITHUB_RUN_ID} | jq -r .created_at)"
-           TAG="玩客云armbian桌面版-$(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')"
-           export CORE_TAG=${TAG}
-           echo $CORE_TAG
-           
-           echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
-           echo ${{ env.CORE_TAG }}
+}
