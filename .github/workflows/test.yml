@@ -1,5 +1,5 @@
 name: 玩客云armbain测试脚本
-#desktop版本6.12内核只有noble、oracular、plucky、bullseye、bookworm编译成功
+#desktop版本6.12内核只有noble、oracular、plucky、bookworm编译成功
 
 on:
   #对应的是 UTC 时间，需要转换，0 代表北京时间8点，每个月1日/15日12点编译一次
@@ -42,7 +42,7 @@ jobs:
            
            #TIME="$(curl https://api.github.com/repos/${{ github.repository }}/actions/runs/${GITHUB_RUN_ID} | jq -r .created_at)"
            TIME=${{ steps.time.outputs.time }}
-           TAG="玩客云armbian桌面版-$(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')"
+           TAG="玩客云armbian桌面版"-${TIME}
            export CORE_TAG=${TAG}
            echo $CORE_TAG
            
@@ -52,10 +52,10 @@ jobs:
 
     outputs:
       CORE_TAG: ${{ steps.get.outputs.CORE_TAG }} 
-      BRANCH: ${{ env.BRANCH_TYPE }}      
-           
+      BRANCH: ${{ env.BRANCH_TYPE }}
+      
   build_armbian_firmware:
-    name:  编译-${{ matrix.TYPE }}_${{ matrix.RELEASE }}
+    name:  编译-${{ env.BRANCH_TYPE }}-${{ matrix.TYPE }}_${{ matrix.RELEASE }}
     needs: prepare
     runs-on: ubuntu-latest
     strategy:
