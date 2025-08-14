@@ -1,4 +1,4 @@
-name: Build Armbian OneCloud Burn
+name: 成熟版本
 
 on:
   workflow_dispatch:
