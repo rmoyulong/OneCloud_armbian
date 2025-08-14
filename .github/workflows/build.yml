@@ -201,7 +201,7 @@ jobs:
         TYPE:
           - minimal
           - cli
-          #- desktop
+          - desktop
         include:
           - TYPE: desktop
             DESKTOP_ENVIRONMENT: xfce
