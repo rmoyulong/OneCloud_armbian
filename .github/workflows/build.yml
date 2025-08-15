@@ -17,14 +17,14 @@ permissions:
 
 jobs:
   prepare:
-    name: Prepare
+    name: prepare
     runs-on: ubuntu-latest
     outputs:
       env: ${{ steps.get.outputs.env }}
 
     steps:
       - id: get
-        name: Get repositories and Armbian information
+        name: 获取项目仓库和 Armbian 信息
         run: |
           sudo timedatectl set-timezone "Asia/Shanghai"
           TIME="$(curl https://api.github.com/repos/${SCRIPT_REPO}/actions/runs/${GITHUB_RUN_ID} | jq -r .created_at)"
@@ -50,7 +50,7 @@ jobs:
 
           echo "env=$(cat $GITHUB_ENV | base64 -w 0)" >>$GITHUB_OUTPUT
 
-      - name: Show repositories information
+      - name: 显示项目仓库信息
         run: |
           C_RESET="\e[0m"
           C_BLACK="\e[30m"
@@ -83,7 +83,7 @@ jobs:
 
           EOF
 
-      - name: Generate release informations
+      - name: 生成发布信息
         run: |
           cat <<EOF | sed -E 's/^  //' | tee Release.md
             CI $(date -d "$TIME" +'%Y-%m-%d %H:%M:%S %Z(%:z)')
@@ -99,7 +99,7 @@ jobs:
           echo "NAME=$(head --line=1 Release.md)" >>$GITHUB_ENV
           tail --line=+2 Release.md > Body.md
 
-      - name: Create release
+      - name: 上传信息
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
@@ -108,16 +108,16 @@ jobs:
           body_path: Body.md
 
   build-kernel:
-    name: Build Current
+    name: 编译Current分支
     needs: prepare
     runs-on: ubuntu-latest
 
     steps:
-      - name: Import env
+      - name: 导入环境参数
         run: |
           echo "$(echo "${{ needs.prepare.outputs.env }}" | base64 -d)" >>$GITHUB_ENV
 
-      - name: Check server configuration
+      - name: 检查服务器配置
         run: |
           sudo timedatectl set-timezone "Asia/Shanghai"
           echo "-------------------------------CPU信息-------------------------------------------"
@@ -136,13 +136,13 @@ jobs:
           echo "硬盘详情："
           df -Th
 
-      - name: Checkout
+      - name: 检查项目
         uses: actions/checkout@main
         with:
           repository: ${{ env.ARMBIAN_REPO }}
           ref: ${{ env.ARMBIAN_SHA }}
 
-      - name: Build
+      - name: 编译
         run: |
           sudo --preserve-env \
             ./compile.sh kernel \
@@ -153,25 +153,25 @@ jobs:
               EXPERT=yes
           sudo chown $(id -u):$(id -g) -R output/
         
-      - name: Hash kernel
+      - name: 内核哈希信息
         run: |
           for f in output/debs/*.deb; do
             sha256sum "$f" | tee -a sha256sum
           done
 
-      - name: Upload artifacts
+      - name: 上传资料
         uses: actions/upload-artifact@main
         with:
           name: kernel-current
           path: output/debs/*
       
-      - name: Generate release informations
+      - name: 生成发布信息
         run: |
           cat <<EOF | sed -E 's/^  //' | tee Release.md
             $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
           EOF
 
-      - name: Upload to release
+      - name: 上传最新版本
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
@@ -181,7 +181,7 @@ jobs:
             output/debs/*
 
   build:
-    name: Build ${{ matrix.RELEASE }}-current-${{ matrix.TYPE == 'desktop' && matrix.DESKTOP_ENVIRONMENT || matrix.TYPE }}
+    name: 编译 ${{ matrix.RELEASE }}-current-${{ matrix.TYPE == 'desktop' && matrix.DESKTOP_ENVIRONMENT || matrix.TYPE }}
     needs: [ prepare, build-kernel ]
     runs-on: ubuntu-latest
     strategy:
@@ -209,11 +209,11 @@ jobs:
             DESKTOP_APPGROUPS_SELECTED: ""
 
     steps:
-      - name: Import env
+      - name: 导入环境参数
         run: |
           echo "$(echo "${{ needs.prepare.outputs.env }}" | base64 -d)" >>$GITHUB_ENV
 
-      - name: Check server configuration
+      - name: 检查服务器配置
         run: |
           echo "-------------------------------CPU信息-------------------------------------------"
           echo
@@ -231,26 +231,26 @@ jobs:
           echo "硬盘详情："
           df -Th
         
-      - name: Initialization environment
+      - name: 初始化环境
         run: |
           sudo timedatectl set-timezone "Asia/Shanghai"
           sudo apt update -y
           sudo apt install android-sdk-libsparse-utils
           df -Th
 
-      - name: Checkout
+      - name: 检查项目
         uses: actions/checkout@main
         with:
           repository: ${{ env.ARMBIAN_REPO }}
           ref: ${{ env.ARMBIAN_SHA }}
 
-      - name: Download kernel
+      - name: 下载内核
         uses: actions/download-artifact@main
         with:
           name: kernel-current
           path: output/debs/
 
-      - name: Build
+      - name: 编译
         run: |
           sudo --preserve-env \
             ./compile.sh build \
@@ -269,13 +269,13 @@ jobs:
               COMPRESS_OUTPUTIMAGE=img
           sudo chown $(id -u):$(id -g) -R output/
 
-      - name: Install AmlImg
+      - name: 安装AmlImg
         run: |
           ver="v0.3.1"
           curl -L -o ./AmlImg https://github.com/hzyitc/AmlImg/releases/download/$ver/AmlImg_${ver}_linux_amd64
           chmod +x ./AmlImg
 
-      - name: Download and unpack the latest u-boot
+      - name: 下载解压最新u-boot
         run: |
           echo "::group::Download"
           curl -L -o ./uboot.img https://github.com/${UBOOT_REPO}/releases/download/${UBOOT_TAG}/${UBOOT_BURNIMG}
@@ -285,7 +285,7 @@ jobs:
           ./AmlImg unpack ./uboot.img burn/
           echo "::endgroup::"
 
-      - name: Extract boot and rootfs partitions
+      - name: 提取 boot 和 rootfs 分区
         run: |
           diskimg=$(ls output/images/*.img)
           loop=$(sudo losetup --find --show --partscan $diskimg)
@@ -294,7 +294,7 @@ jobs:
           sudo losetup -d $loop
           sudo chown $(id -u):$(id -g) -R burn/
 
-      - name: Generate burn image
+      - name: 生成刻录映像
         run: |
           echo -n "sha1sum $(sha1sum burn/boot.simg | awk '{print $1}')" >burn/boot.VERIFY
           echo -n "sha1sum $(sha1sum burn/rootfs.simg | awk '{print $1}')" >burn/rootfs.VERIFY
@@ -310,26 +310,26 @@ jobs:
           burnimg=${prefix}.burn.img
           ./AmlImg pack $burnimg burn/
 
-      - name: Hash and compress images
+      - name: 哈希和压缩镜像
         run: |
           for f in output/images/*.img; do
             sha256sum "$f" | tee -a sha256sum
             xz --threads=0 --compress "$f"
           done
 
-      - name: Upload artifacts
+      - name: 上传资料
         uses: actions/upload-artifact@main
         with:
           name: ${{ matrix.RELEASE }}-current-${{ matrix.TYPE == 'desktop' && matrix.DESKTOP_ENVIRONMENT || matrix.TYPE }}
           path: output/images/*
 
-      - name: Generate release informations
+      - name: 生成发布信息
         run: |
           cat <<EOF | sed -E 's/^  //' | tee Release.md
             $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
           EOF
 
-      - name: Upload to release
+      - name: 上传最新版本
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
