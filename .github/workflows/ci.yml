@@ -1,4 +1,4 @@
-name: 玩客云armbian经典版
+name: 玩客云armbian全版
 
 on:
   #对应的是 UTC 时间，需要转换，0 代表北京时间8点，每个月2日/15日12点编译一次
@@ -200,6 +200,7 @@ jobs:
         TYPE:
           - minimal        
           - cli
+          - desktop
 
     steps:
       - name: Import env
@@ -310,7 +311,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.RELEASE }}-${{ matrix.BRANCH }}-${{ matrix.TYPE == 'desktop' && matrix.DESKTOP_ENVIRONMENT || matrix.TYPE }}
+          name: ${{ matrix.RELEASE }}-全版-${{ matrix.BRANCH }}-${{ matrix.TYPE == 'desktop' && matrix.DESKTOP_ENVIRONMENT || matrix.TYPE }}
           path: output/images/*
 
       - name: Generate release informations
