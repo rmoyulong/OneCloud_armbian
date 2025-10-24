@@ -10,7 +10,7 @@ env:
   UBOOT_RELEASE: latest
   UBOOT_BURNIMG: eMMC.burn.img
   ARMBIAN_REPO: armbian/build
-  ARMBIAN_REF: v25.11.0-trunk.258
+  ARMBIAN_REF: v25.11.0-trunk.318
 
 permissions:
   contents: write
