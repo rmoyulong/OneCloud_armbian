@@ -320,7 +320,7 @@ jobs:
       - name: 上传资料
         uses: actions/upload-artifact@main
         with:
-          name: ${{ matrix.RELEASE }}-current-${{ matrix.TYPE == 'desktop' && matrix.DESKTOP_ENVIRONMENT || matrix.TYPE }}
+          name: ${{ matrix.RELEASE }}-可靠版-${{ matrix.TYPE == 'desktop' && matrix.DESKTOP_ENVIRONMENT || matrix.TYPE }}
           path: output/images/*
 
       - name: 生成发布信息
