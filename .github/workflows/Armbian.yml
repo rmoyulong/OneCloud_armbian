@@ -26,7 +26,7 @@ jobs:
           - desktop
           
     steps:
-      - uses: armbian/build@main
+      - uses: armbian/build@v25.11.0-trunk.287
         with:
           armbian_token:     "${{ secrets.GITHUB_TOKEN }}"  # GitHub token
           armbian_release:   "${{ matrix.RELEASE }}"                        # userspace
