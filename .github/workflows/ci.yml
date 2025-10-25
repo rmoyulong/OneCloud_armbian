@@ -1,8 +1,6 @@
-name: 玩客云armbian全版
+name: 全版
 
 on:
-  #对应的是 UTC 时间，需要转换，0 代表北京时间8点，每个月2日/15日12点编译一次
-  #关闭则手动编译
   workflow_dispatch:
 
 env:
@@ -13,28 +11,33 @@ env:
   UBOOT_BURNIMG: eMMC.burn.img
   ARMBIAN_REPO: armbian/build
   ARMBIAN_REF: v25.11.0-trunk.287
-  PATCHES: 4077,5076
-  PATCHES_DISABLED: 5082
 
 permissions:
   contents: write
 
 jobs:
   prepare:
-    name: Prepare
-    runs-on: ubuntu-22.04
+    name: prepare
+    runs-on: ubuntu-latest
     outputs:
       env: ${{ steps.get.outputs.env }}
+
     steps:
       - id: get
-        name: Get repositories information
+        name: 获取项目仓库和 Armbian 信息
         run: |
+          sudo timedatectl set-timezone "Asia/Shanghai"
           TIME="$(curl https://api.github.com/repos/${SCRIPT_REPO}/actions/runs/${GITHUB_RUN_ID} | jq -r .created_at)"
-          TAG="ci-$(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')"
+          TAG="ci-$(date -d "$TIME" -u +'%Y%m%d-%H%M%S-%Z')"
 
           SCRIPT_SHA=$(curl https://api.github.com/repos/${SCRIPT_REPO}/commits/${SCRIPT_REF} | jq -r .sha)
           UBOOT_TAG=$(curl https://api.github.com/repos/${UBOOT_REPO}/releases/${UBOOT_RELEASE} | jq -r .tag_name)
           ARMBIAN_SHA=$(curl https://api.github.com/repos/${ARMBIAN_REPO}/commits/${ARMBIAN_REF} | jq -r .sha)
+
+          echo "Cloning Armbian repository..."
+          git clone https://github.com/armbian/os os
+
+          ARMBIAN_VERSION=$(cat os/stable.json | jq '.version' | sed "s/\"//g")
 
           cat <<EOF | sed -E 's/^  //' >>$GITHUB_ENV
             TIME=$TIME
@@ -42,10 +45,12 @@ jobs:
             SCRIPT_SHA=$SCRIPT_SHA
             UBOOT_TAG=$UBOOT_TAG
             ARMBIAN_SHA=$ARMBIAN_SHA
+            ARMBIAN_VERSION=$ARMBIAN_VERSION
           EOF
+
           echo "env=$(cat $GITHUB_ENV | base64 -w 0)" >>$GITHUB_OUTPUT
 
-      - name: Show repositories information
+      - name: 显示项目仓库信息
         run: |
           C_RESET="\e[0m"
           C_BLACK="\e[30m"
@@ -68,13 +73,6 @@ jobs:
           EOF
           )"
 
-          if [[ -n "${PATCHES}" ]]; then
-            echo -e "\nPatches:"
-            while read -r id; do
-              echo -e "  ${C_BLUE}armbian/build${C_RESET}#${C_MAGENTA}${id}${C_RESET}(http://github.com/armbian/build/pull/${id})"
-            done < <(echo -e "${PATCHES}" | tr ',' '\n')
-          fi
-
           cat <<EOF | sed -E 's/^  //' >>$GITHUB_STEP_SUMMARY
             # $(date -d "$TIME" +'%Y-%m-%d %H:%M:%S %Z(%:z)')
 
@@ -83,13 +81,9 @@ jobs:
             U-Boot: [${UBOOT_REPO}@${UBOOT_RELEASE}](https://github.com/${UBOOT_REPO}/releases/tag/${UBOOT_RELEASE}) ([\`${UBOOT_TAG}\`](https://github.com/${UBOOT_REPO}/releases/tag/${UBOOT_TAG}))
             Armbian: [${ARMBIAN_REPO}@${ARMBIAN_REF}](https://github.com/${ARMBIAN_REPO}/tree/${ARMBIAN_REF}) ([\`${ARMBIAN_SHA}\`](https://github.com/${ARMBIAN_REPO}/tree/${ARMBIAN_SHA}))
 
-            ${PATCHES:+$(
-              echo "## Patches"
-              echo "${PATCHES}" | tr ',' '\n' | sed -E 's|(.*)|[armbian/build#\1](http://github.com/armbian/build/pull/\1)|'
-            )}
           EOF
 
-      - name: Generate release informations
+      - name: 生成发布信息
         run: |
           cat <<EOF | sed -E 's/^  //' | tee Release.md
             CI-全版 $(date -d "$TIME" +'%Y-%m-%d %H:%M:%S %Z(%:z)')
@@ -99,18 +93,13 @@ jobs:
             U-Boot: [${UBOOT_REPO}@${UBOOT_RELEASE}](https://github.com/${UBOOT_REPO}/releases/tag/${UBOOT_RELEASE}) ([\`${UBOOT_TAG}\`](https://github.com/${UBOOT_REPO}/releases/tag/${UBOOT_TAG}))
             Armbian: [${ARMBIAN_REPO}@${ARMBIAN_REF}](https://github.com/${ARMBIAN_REPO}/tree/${ARMBIAN_REF}) ([\`${ARMBIAN_SHA}\`](https://github.com/${ARMBIAN_REPO}/tree/${ARMBIAN_SHA}))
 
-            ${PATCHES:+$(
-              echo "# Patches"
-              echo "${PATCHES}" | tr ',' '\n' | sed -E 's|(.*)|[armbian/build#\1](http://github.com/armbian/build/pull/\1)|'
-            )}
-
             # SHA256
           EOF
 
           echo "NAME=$(head --line=1 Release.md)" >>$GITHUB_ENV
-          tail --line=+2 Release.md >Body.md
+          tail --line=+2 Release.md > Body.md
 
-      - name: Create release
+      - name: 上传信息
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
@@ -118,75 +107,86 @@ jobs:
           name: ${{ env.NAME }}
           body_path: Body.md
 
-  build-debs:
-    name: Build ${{ matrix.BRANCH }}
+  build-kernel:
+    name: 编译Current分支
     needs: prepare
-    runs-on: ubuntu-22.04
-    strategy:
-      fail-fast: false
-      matrix:
-        BRANCH:
-          - current
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Import env
+      - name: 导入环境参数
         run: |
           echo "$(echo "${{ needs.prepare.outputs.env }}" | base64 -d)" >>$GITHUB_ENV
 
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: 检查服务器配置
+        run: |
+          sudo timedatectl set-timezone "Asia/Shanghai"
+          echo "-------------------------------CPU信息-------------------------------------------"
+          echo
+          echo "CPU物理数量:$(cat /proc/cpuinfo| grep "physical id"| sort| uniq| wc -l)"
+          echo "CPU核心及版本信息:$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c)"
+          echo
+          echo "-------------------------------内存信息-------------------------------------------"
+          echo
+          echo "已安装内存详细信息："
+          sudo lshw -short -C memory | grep GiB
+          echo
+          echo "-------------------------------硬盘信息--------------------------------------------"
+          echo
+          echo "硬盘数量：$(ls /dev/sd* | grep -v [1-9] | wc -l)"
+          echo "硬盘详情："
+          df -Th
+
+      - name: 检查项目
+        uses: actions/checkout@main
         with:
           repository: ${{ env.ARMBIAN_REPO }}
           ref: ${{ env.ARMBIAN_SHA }}
 
-      - name: "Apply patch ${{ env.PATCHES }}"
-        if: ${{ env.PATCHES }}
+      - name: 编译
         run: |
-          echo "::group::Download"
-          curl -L -O "https://github.com/armbian/build/pull/{${PATCHES}}.patch"
-          echo "::endgroup::"
-
-          for file in *.patch; do
-            echo "::group::Applying $file"
-            patch --batch -p1 -N <"$file"
-            echo "::endgroup::"
-          done
-
-      - name: Build
-        run: |
-          # Don't update remote cache
-          export GITHUB_ACTIONS=false
           sudo --preserve-env \
             ./compile.sh kernel \
+              REVISION="${{ env.ARMBIAN_VERSION }}" \
               ALLOW_ROOT=yes \
               BOARD=onecloud \
-              BRANCH=${{ matrix.BRANCH }} \
-              EXPERT=yes \
-              USE_CCACHE=no
+              BRANCH=current \
+              EXPERT=yes
           sudo chown $(id -u):$(id -g) -R output/
+        
+      - name: 内核哈希信息
+        run: |
+          for f in output/debs/*.deb; do
+            sha256sum "$f" | tee -a sha256sum
+          done
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+      - name: 上传资料
+        uses: actions/upload-artifact@main
         with:
-          name: debs-${{ matrix.BRANCH }}
+          name: kernel-current
           path: output/debs/*
+      
+      - name: 生成发布信息
+        run: |
+          cat <<EOF | sed -E 's/^  //' | tee Release.md
+            $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
+          EOF
 
-      - name: Upload to release
+      - name: 上传最新版本
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
+          append_body: true
+          body_path: Release.md
           files: |
             output/debs/*
 
   build:
-    name: Build ${{ matrix.RELEASE }}-${{ matrix.BRANCH }}-${{ matrix.TYPE == 'desktop' && matrix.DESKTOP_ENVIRONMENT || matrix.TYPE }}
-    needs: [ prepare, build-debs ]
-    runs-on: ubuntu-22.04
+    name: 编译 ${{ matrix.RELEASE }}-current-${{ matrix.TYPE == 'desktop' && matrix.DESKTOP_ENVIRONMENT || matrix.TYPE }}
+    needs: [ prepare, build-kernel ]
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        BRANCH:
-          - current
         RELEASE:
           # - focal # Ubuntu 20.04 LTS
           # - jammy # Ubuntu 22.04 LTS
@@ -197,7 +197,7 @@ jobs:
           # - bullseye # Debian 11
           - bookworm # Debian 12
           - trixie # Debian 13
-          - sid # Debian unstable
+          #- sid # Debian unstable
         TYPE:
           - minimal
           - cli
@@ -209,44 +209,55 @@ jobs:
             DESKTOP_APPGROUPS_SELECTED: ""
 
     steps:
-      - name: Import env
+      - name: 导入环境参数
         run: |
           echo "$(echo "${{ needs.prepare.outputs.env }}" | base64 -d)" >>$GITHUB_ENV
 
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: 检查服务器配置
+        run: |
+          echo "-------------------------------CPU信息-------------------------------------------"
+          echo
+          echo "CPU物理数量:$(cat /proc/cpuinfo| grep "physical id"| sort| uniq| wc -l)"
+          echo "CPU核心及版本信息:$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c)"
+          echo
+          echo "-------------------------------内存信息-------------------------------------------"
+          echo
+          echo "已安装内存详细信息："
+          sudo lshw -short -C memory | grep GiB
+          echo
+          echo "-------------------------------硬盘信息--------------------------------------------"
+          echo
+          echo "硬盘数量：$(ls /dev/sd* | grep -v [1-9] | wc -l)"
+          echo "硬盘详情："
+          df -Th
+        
+      - name: 初始化环境
+        run: |
+          sudo timedatectl set-timezone "Asia/Shanghai"
+          sudo apt update -y
+          sudo apt install android-sdk-libsparse-utils
+          df -Th
+
+      - name: 检查项目
+        uses: actions/checkout@main
         with:
           repository: ${{ env.ARMBIAN_REPO }}
           ref: ${{ env.ARMBIAN_SHA }}
 
-      - name: "Apply patch ${{ env.PATCHES }}"
-        if: ${{ env.PATCHES }}
-        run: |
-          echo "::group::Download"
-          curl -L -O "https://github.com/armbian/build/pull/{${PATCHES}}.patch"
-          echo "::endgroup::"
-
-          for file in *.patch; do
-            echo "::group::Applying $file"
-            patch --batch -p1 -N <"$file"
-            echo "::endgroup::"
-          done
-
-      - name: Download debs
-        uses: actions/download-artifact@v4
+      - name: 下载内核
+        uses: actions/download-artifact@main
         with:
-          name: debs-${{ matrix.BRANCH }}
+          name: kernel-current
           path: output/debs/
 
-      - name: Build
+      - name: 编译
         run: |
-          # Don't update remote cache
-          export GITHUB_ACTIONS=false
           sudo --preserve-env \
             ./compile.sh build \
+              REVISION="${{ env.ARMBIAN_VERSION }}" \
               ALLOW_ROOT=yes \
               BOARD=onecloud \
-              BRANCH=${{ matrix.BRANCH }} \
+              BRANCH=current \
               RELEASE=${{ matrix.RELEASE }} \
               KERNEL_CONFIGURE=no \
               BUILD_MINIMAL=${{ matrix.TYPE == 'minimal' && 'yes' || 'no' }} \
@@ -255,21 +266,16 @@ jobs:
               DESKTOP_ENVIRONMENT_CONFIG_NAME=${{ matrix.DESKTOP_ENVIRONMENT_CONFIG_NAME }} \
               DESKTOP_APPGROUPS_SELECTED=${{ matrix.DESKTOP_APPGROUPS_SELECTED }} \
               EXPERT=yes \
-              SKIP_EXTERNAL_TOOLCHAINS=yes \
-              CLEAN_LEVEL= \
-              USE_CCACHE=no \
               COMPRESS_OUTPUTIMAGE=img
           sudo chown $(id -u):$(id -g) -R output/
 
-      - name: Install Dependents
+      - name: 安装AmlImg
         run: |
-          sudo apt install img2simg
-
           ver="v0.3.1"
           curl -L -o ./AmlImg https://github.com/hzyitc/AmlImg/releases/download/$ver/AmlImg_${ver}_linux_amd64
           chmod +x ./AmlImg
 
-      - name: Download and unpack the latest u-boot
+      - name: 下载解压最新u-boot
         run: |
           echo "::group::Download"
           curl -L -o ./uboot.img https://github.com/${UBOOT_REPO}/releases/download/${UBOOT_TAG}/${UBOOT_BURNIMG}
@@ -279,7 +285,7 @@ jobs:
           ./AmlImg unpack ./uboot.img burn/
           echo "::endgroup::"
 
-      - name: Extract boot and rootfs partitions
+      - name: 提取 boot 和 rootfs 分区
         run: |
           diskimg=$(ls output/images/*.img)
           loop=$(sudo losetup --find --show --partscan $diskimg)
@@ -288,7 +294,7 @@ jobs:
           sudo losetup -d $loop
           sudo chown $(id -u):$(id -g) -R burn/
 
-      - name: Generate burn image
+      - name: 生成刻录映像
         run: |
           echo -n "sha1sum $(sha1sum burn/boot.simg | awk '{print $1}')" >burn/boot.VERIFY
           echo -n "sha1sum $(sha1sum burn/rootfs.simg | awk '{print $1}')" >burn/rootfs.VERIFY
@@ -304,26 +310,26 @@ jobs:
           burnimg=${prefix}.burn.img
           ./AmlImg pack $burnimg burn/
 
-      - name: Hash and compress images
+      - name: 哈希和压缩镜像
         run: |
           for f in output/images/*.img; do
             sha256sum "$f" | tee -a sha256sum
             xz --threads=0 --compress "$f"
           done
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+      - name: 上传资料
+        uses: actions/upload-artifact@main
         with:
-          name: ${{ matrix.RELEASE }}-${{ matrix.BRANCH }}-${{ matrix.TYPE == 'desktop' && matrix.DESKTOP_ENVIRONMENT || matrix.TYPE }}
+          name: ${{ matrix.RELEASE }}-可靠版-${{ matrix.TYPE == 'desktop' && matrix.DESKTOP_ENVIRONMENT || matrix.TYPE }}
           path: output/images/*
 
-      - name: Generate release informations
+      - name: 生成发布信息
         run: |
           cat <<EOF | sed -E 's/^  //' | tee Release.md
             $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
           EOF
 
-      - name: Upload to release
+      - name: 上传最新版本
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
