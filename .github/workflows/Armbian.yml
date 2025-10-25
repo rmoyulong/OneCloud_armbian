@@ -1,0 +1,38 @@
+name: "官方版编译玩客云三代 Armbian"
+on:
+  workflow_dispatch:
+  
+jobs:
+  armbian_build_core:
+    name: armbian-"${{ matrix.RELEASE }}"-"${{ matrix.TYPE }}"-固件编译
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        RELEASE:
+          # - focal # Ubuntu 20.04 LTS
+          # - jammy # Ubuntu 22.04 LTS
+          - noble # Ubuntu 24.04 LTS
+          - oracular # Ubuntu 24.10
+          - plucky # Ubuntu 25.04
+          # - buster # Debian 10
+          # - bullseye # Debian 11
+          - bookworm # Debian 12
+          - trixie # Debian 13
+          #- sid # Debian unstable
+        TYPE:
+          - minimal
+          - server
+          - desktop
+          
+    steps:
+      - uses: armbian/build@main
+        with:
+          armbian_token:     "${{ secrets.GITHUB_TOKEN }}"  # GitHub token
+          armbian_release:   "${{ matrix.RELEASE }}"                        # userspace
+          armbian_target:    "build"                        # build=image, kernel=kernel
+          armbian_board:     "onecloud"                   # build target
+          armbian_branch:    "v25.11.0-trunk.287"
+          armbian_kernel_branch:    "current"
+          armbian_release_tag:      "使用armbian官方编译方式的版本"
+          armbian_ui:               "${{ matrix.TYPE }}"
