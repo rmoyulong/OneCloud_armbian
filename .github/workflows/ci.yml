@@ -197,7 +197,7 @@ jobs:
           # - bullseye # Debian 11
           - bookworm # Debian 12
           - trixie # Debian 13
-          #- sid # Debian unstable
+          - sid # Debian unstable
         TYPE:
           - minimal
           - cli
