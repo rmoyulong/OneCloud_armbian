@@ -45,6 +45,5 @@ jobs:
           armbian_board:     "onecloud"                   # build target
           armbian_branch:    "${{ inputs.branch_version }}"
           armbian_kernel_branch:    "current"
-          armbian_release_tag:      "使用armbian官方编译方式的版本"
           armbian_ui:               "${{ matrix.TYPE }}"
           armbian_release_tittle:   "玩客云三代(WS1608) Armbian镜像"
