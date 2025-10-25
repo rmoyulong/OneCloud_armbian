@@ -4,14 +4,14 @@ on:
      inputs:
       branch_version:
         type: choice
-        description: 选择编译的源码分支
+        description: 选择源码分支
         required: true
-        default: "v25.11.0-trunk.287"
-        options: 
+        default: "main"
+        options:
+        - v25.11.0-trunk.351
+        - v25.11.0-trunk.318
         - v25.11.0-trunk.287
         - main
-        - v25.11.0-trunk.318
-        - v25.11.0-trunk.351
         
 jobs:
   armbian_build_core:
@@ -47,3 +47,4 @@ jobs:
           armbian_kernel_branch:    "current"
           armbian_release_tag:      "使用armbian官方编译方式的版本"
           armbian_ui:               "${{ matrix.TYPE }}"
+          armbian_release_tittle:   "玩客云三代(WS1608) Armbian镜像"
