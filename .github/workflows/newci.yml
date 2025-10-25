@@ -86,7 +86,7 @@ jobs:
       - name: 生成发布信息
         run: |
           cat <<EOF | sed -E 's/^  //' | tee Release.md
-            CI $(date -d "$TIME" +'%Y-%m-%d %H:%M:%S %Z(%:z)')
+            CI-可靠版 $(date -d "$TIME" +'%Y-%m-%d %H:%M:%S %Z(%:z)')
 
             # Sources
             Script: [${SCRIPT_REPO}@${SCRIPT_REF}](https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_REF}) ([\`${SCRIPT_SHA}\`](https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_SHA}))

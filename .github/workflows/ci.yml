@@ -8,12 +8,13 @@ on:
 env:
   SCRIPT_REPO: ${{ github.repository }}
   SCRIPT_REF: ${{ github.ref_name }}
-  UBOOT_REPO: soulteary/onecloud-u-boot
+  UBOOT_REPO: hzyitc/u-boot-onecloud
   UBOOT_RELEASE: latest
   UBOOT_BURNIMG: eMMC.burn.img
   ARMBIAN_REPO: armbian/build
   ARMBIAN_REF: v25.11.0-trunk.287
   PATCHES: 4077,5076
+  PATCHES_DISABLED: 5082
 
 permissions:
   contents: write
@@ -91,7 +92,7 @@ jobs:
       - name: Generate release informations
         run: |
           cat <<EOF | sed -E 's/^  //' | tee Release.md
-            CI $(date -d "$TIME" +'%Y-%m-%d %H:%M:%S %Z(%:z)')
+            CI-全版 $(date -d "$TIME" +'%Y-%m-%d %H:%M:%S %Z(%:z)')
 
             # Sources
             Script: [${SCRIPT_REPO}@${SCRIPT_REF}](https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_REF}) ([\`${SCRIPT_SHA}\`](https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_SHA}))
@@ -192,15 +193,20 @@ jobs:
           - noble # Ubuntu 24.04 LTS
           - oracular # Ubuntu 24.10
           - plucky # Ubuntu 25.04
-          #- buster # Debian 10
-          #- bullseye # Debian 11
+          # - buster # Debian 10
+          # - bullseye # Debian 11
           - bookworm # Debian 12
           - trixie # Debian 13
-          # - sid # Debian unstable
+          - sid # Debian unstable
         TYPE:
-          - minimal        
+          - minimal
           - cli
           - desktop
+        include:
+          - TYPE: desktop
+            DESKTOP_ENVIRONMENT: xfce
+            DESKTOP_ENVIRONMENT_CONFIG_NAME: config_base
+            DESKTOP_APPGROUPS_SELECTED: ""
 
     steps:
       - name: Import env
@@ -252,16 +258,13 @@ jobs:
               SKIP_EXTERNAL_TOOLCHAINS=yes \
               CLEAN_LEVEL= \
               USE_CCACHE=no \
-              ROOTFS_TYPE=btrfs \
-              BTRFS_COMPRESSION=zstd:4 \
               COMPRESS_OUTPUTIMAGE=img
           sudo chown $(id -u):$(id -g) -R output/
 
-
       - name: Install Dependents
         run: |
-          sudo apt-get update
-          sudo apt install -y img2simg btrfs-progs
+          sudo apt install img2simg
+
           ver="v0.3.1"
           curl -L -o ./AmlImg https://github.com/hzyitc/AmlImg/releases/download/$ver/AmlImg_${ver}_linux_amd64
           chmod +x ./AmlImg
@@ -311,7 +314,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.RELEASE }}-全版-${{ matrix.BRANCH }}-${{ matrix.TYPE == 'desktop' && matrix.DESKTOP_ENVIRONMENT || matrix.TYPE }}
+          name: ${{ matrix.RELEASE }}-${{ matrix.BRANCH }}-${{ matrix.TYPE == 'desktop' && matrix.DESKTOP_ENVIRONMENT || matrix.TYPE }}
           path: output/images/*
 
       - name: Generate release informations
