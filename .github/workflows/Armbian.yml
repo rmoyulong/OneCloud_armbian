@@ -4,7 +4,7 @@ on:
      inputs:
       branch_version:
         type: choice
-        description: 选择需要编译的直刷包类型
+        description: 选择编译的源码分支
         required: true
         default: "v25.11.0-trunk.287"
         options: 
