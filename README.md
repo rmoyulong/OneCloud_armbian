@@ -1,5 +1,5 @@
 # armbian-onecloud 玩客云三代(WS1608)
-[![build](https://img.shields.io/github/actions/workflow/status/rmoyulong/OneCloud_armbian/ci.yml)](https://github.com/rmoyulong/OneCloud_armbian/actions/workflows/ci.yml) [![downloads](https://img.shields.io/github/downloads/rmoyulong/OneCloud_armbian/total)](https://github.com/rmoyulong/OneCloud_armbian/releases) [![downloads@latest](https://img.shields.io/github/downloads/rmoyulong/OneCloud_armbian/latest/total)](https://github.com/rmoyulong/OneCloud_armbian/releases/latest)
+[![build](https://img.shields.io/github/actions/workflow/status/rmoyulong/OneCloud_armbian/newci.yml)](https://github.com/rmoyulong/OneCloud_armbian/actions/workflows/newci.yml) [![downloads](https://img.shields.io/github/downloads/rmoyulong/OneCloud_armbian/total)](https://github.com/rmoyulong/OneCloud_armbian/releases) [![downloads@latest](https://img.shields.io/github/downloads/rmoyulong/OneCloud_armbian/latest/total)](https://github.com/rmoyulong/OneCloud_armbian/releases/latest)
 
 [README](README.md) | [中文文档](README_zh.md)
 
@@ -59,4 +59,5 @@ NOTE: These pins in the `dts` were measured on `V1.0 board` and have not been ve
 [`xdarklight/linux@meson-mx-integration-5.18-20220417`](https://github.com/xdarklight/linux/tree/meson-mx-integration-5.18-20220417) - the source code of `HDMI` patch
 
 [`S805_Datasheet V0.8 20150126.pdf`](https://dn.odroid.com/S805/Datasheet/S805_Datasheet%20V0.8%2020150126.pdf) - S805 datasheet
+
 
