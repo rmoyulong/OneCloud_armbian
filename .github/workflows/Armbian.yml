@@ -8,9 +8,9 @@ on:
         required: true
         default: "main"
         options:
-        - v25.11.0-trunk.351
-        - v25.11.0-trunk.318
-        - v25.11.0-trunk.287
+        - v25.11.0-trunk.457
+        - v25.11.0-trunk.414
+        - v25.11.0-trunk.382
         - main
         
 jobs:
