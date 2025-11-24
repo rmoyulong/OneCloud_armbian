@@ -202,11 +202,11 @@ jobs:
           - minimal
           - cli
           - desktop
-        include:
-          - TYPE: desktop
-            DESKTOP_ENVIRONMENT: xfce
-            DESKTOP_ENVIRONMENT_CONFIG_NAME: config_base
-            DESKTOP_APPGROUPS_SELECTED: ""
+        #include:
+          #- TYPE: desktop
+            #DESKTOP_ENVIRONMENT: xfce
+            #DESKTOP_ENVIRONMENT_CONFIG_NAME: config_base
+            #DESKTOP_APPGROUPS_SELECTED: ""
 
     steps:
       - name: 导入环境参数
@@ -271,14 +271,14 @@ jobs:
 
       - name: 安装AmlImg
         run: |
-          ver="v0.3.1"
-          curl -L -o ./AmlImg https://github.com/hzyitc/AmlImg/releases/download/$ver/AmlImg_${ver}_linux_amd64
-          chmod +x ./AmlImg
+          ver="v0.3.2"
+          curl -L -o ./AmlImg https://github.com/rmoyulong/AmlImg/releases/download/$ver/AmlImg_${ver}_linux_amd64
+          chmod +x ./AmlImg          
 
       - name: 下载解压最新u-boot
         run: |
           echo "::group::Download"
-          curl -L -o ./uboot.img https://github.com/${UBOOT_REPO}/releases/download/${UBOOT_TAG}/${UBOOT_BURNIMG}
+          curl -L -o ./uboot.img https://github.com/rmoyulong/u-boot-onecloud/releases/download/Onecloud_Uboot_23.12.24_18.15.09/eMMC.burn.img
           echo "::endgroup::"
 
           echo "::group::Unpack"
