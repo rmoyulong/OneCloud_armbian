@@ -1,0 +1,84 @@
+name: 玩客云armbain测试脚本
+#desktop版本6.12内核只有noble、oracular、plucky、bookworm编译成功
+
+on:
+  #对应的是 UTC 时间，需要转换，0 代表北京时间8点，每个月1日/15日12点编译一次
+  #关闭则手动编译
+  workflow_dispatch:
+    inputs:
+      BRANCH_TYPE:
+        description: '分支类型'     
+        required: false
+        default: 'current' 
+        type: choice
+        options:
+        - current
+        - edge
+
+env:
+  PATCHES: 4077,5076
+  PATCHES_DISABLED: 5082
+  BRANCH_TYPE: ${{ github.event.inputs.BRANCH_TYPE }}
+  
+permissions:
+  contents: write
+  
+jobs:
+  prepare:
+    name: Prepare
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Time
+        id: time
+        uses: nanzm/get-time-action@master
+        with:
+          timeZone: Asia/Shanghai
+          format: 'YYYY-MM-DD-HH:mm:ss'
+          
+      - name: 下载最新armbian库
+        id: get
+        run: |
+           #git clone --depth=1 --branch=main https://github.com/armbian/build build
+           
+           #TIME="$(curl https://api.github.com/repos/${{ github.repository }}/actions/runs/${GITHUB_RUN_ID} | jq -r .created_at)"
+           TIME=${{ steps.time.outputs.time }}
+           TAG="玩客云armbian桌面版"-${TIME}
+           export CORE_TAG=${TAG}
+           echo $CORE_TAG
+           
+           echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
+           echo "CORE_TAG=$CORE_TAG" >> $GITHUB_OUTPUT
+           echo ${{ env.CORE_TAG }}
+
+    outputs:
+      CORE_TAG: ${{ steps.get.outputs.CORE_TAG }} 
+      BRANCH: ${{ github.event.inputs.BRANCH_TYPE }}
+      
+  build_armbian_firmware:
+    name:  编译-${{ needs.prepare.outputs.BRANCH }}-${{ matrix.TYPE }}_${{ matrix.RELEASE }}
+    needs: prepare
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        RELEASE:
+          # - focal # Ubuntu 20.04 LTS
+          # - jammy # Ubuntu 22.04 LTS
+          # - noble # Ubuntu 24.04 LTS
+          - oracular # Ubuntu 24.10
+          #- plucky # Ubuntu 25.04
+          # - buster # Debian 10
+          #- bullseye # Debian 11
+          - bookworm # Debian 12
+          # - trixie # Debian 13
+          # - sid # Debian unstable
+        TYPE:
+          #- minimal
+          #- cli
+          - desktop      
+        
+    steps:
+      - name: 获得环境变量
+        run: |
+           echo ${{ needs.prepare.outputs.BRANCH }}-"${{ matrix.RELEASE }}"-"${{ matrix.TYPE }}"
+           echo ${{ needs.prepare.outputs.CORE_TAG }}
