@@ -266,15 +266,17 @@ jobs:
 
       - name: 安装AmlImg
         run: |
-          ver="v0.3.2"
-          curl -L -o ./AmlImg https://github.com/rmoyulong/AmlImg/releases/download/$ver/AmlImg_${ver}_linux_amd64
+          #ver="v0.3.2"
+          #curl -L -o ./AmlImg https://github.com/rmoyulong/AmlImg/releases/download/$ver/AmlImg_${ver}_linux_amd64
+          mv $GITHUB_WORKSPACE/tools/AmlImg_v0.3.2_linux_amd64 ./AmlImg
           chmod +x ./AmlImg          
 
       - name: 下载解压最新u-boot
         run: |
-          echo "::group::Download"
-          curl -L -o ./uboot.img https://github.com/rmoyulong/u-boot-onecloud/releases/download/Onecloud_Uboot_23.12.24_18.15.09/eMMC.burn.img
-          echo "::endgroup::"
+          #echo "::group::Download"
+          #curl -L -o ./uboot.img https://github.com/rmoyulong/u-boot-onecloud/releases/download/Onecloud_Uboot_23.12.24_18.15.09/eMMC.burn.img
+          #echo "::endgroup::"
+          mv $GITHUB_WORKSPACE/tools/eMMC.burn.img ./uboot.img
 
           echo "::group::Unpack"
           ./AmlImg unpack ./uboot.img burn/
