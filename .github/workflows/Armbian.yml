@@ -36,7 +36,7 @@ jobs:
         TYPE:
           - minimal
           - server
-          - xfce
+          #- xfce
           
     steps:
       - uses: armbian/build@main
