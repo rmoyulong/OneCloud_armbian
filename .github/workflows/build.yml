@@ -28,7 +28,7 @@ jobs:
         run: |
           sudo timedatectl set-timezone "Asia/Shanghai"
           TIME="$(curl https://api.github.com/repos/${SCRIPT_REPO}/actions/runs/${GITHUB_RUN_ID} | jq -r .created_at)"
-          TAG="Onecloud-$(date -d "$TIME" -u +'%Y%m%d-%H%M%S-%Z')"
+          TAG="ci-$(date -d "$TIME" -u +'%Y%m%d-%H%M%S-%Z')"
 
           SCRIPT_SHA=$(curl https://api.github.com/repos/${SCRIPT_REPO}/commits/${SCRIPT_REF} | jq -r .sha)
           UBOOT_TAG=$(curl https://api.github.com/repos/${UBOOT_REPO}/releases/${UBOOT_RELEASE} | jq -r .tag_name)
