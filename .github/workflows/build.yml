@@ -269,7 +269,8 @@ jobs:
           ver="v0.3.2"
           curl -L -o ./AmlImg https://github.com/rmoyulong/AmlImg/releases/download/$ver/AmlImg_${ver}_linux_amd64
           #cp -a $GITHUB_WORKSPACE/tools/AmlImg_v0.3.2_linux_amd64 ./AmlImg
-          chmod +x ./AmlImg          
+          #chmod +x ./AmlImg
+          chmod -Rf 755 $GITHUB_WORKSPACE/tools/AmlImg_v0.3.2_linux_amd64    
 
       - name: 下载解压最新u-boot
         run: |
@@ -279,7 +280,7 @@ jobs:
           #cp -a $GITHUB_WORKSPACE/tools/eMMC.burn.img ./uboot.img
 
           echo "::group::Unpack"
-          ./AmlImg unpack $GITHUB_WORKSPACE/tools/eMMC.burn.img burn/
+          $GITHUB_WORKSPACE/tools/AmlImg_v0.3.2_linux_amd64 unpack $GITHUB_WORKSPACE/tools/eMMC.burn.img burn/
           echo "::endgroup::""
 
       - name: 提取 boot 和 rootfs 分区
