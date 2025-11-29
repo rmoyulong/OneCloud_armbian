@@ -48,4 +48,4 @@ jobs:
           armbian_branch:    "${{ inputs.branch_version }}"
           armbian_kernel_branch:    "current"
           armbian_ui:               "${{ matrix.TYPE }}"
-          armbian_release_tittle:   "玩客云三代(WS1608) Armbian镜像"
+          armbian_release_tittle:   "玩客云三代(WS1608) Armbian官方镜像"
