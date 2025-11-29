@@ -279,7 +279,7 @@ jobs:
           #cp -a $GITHUB_WORKSPACE/tools/eMMC.burn.img ./uboot.img
 
           echo "::group::Unpack"
-          ./AmlImg unpack ./uboot.img burn/
+          ./AmlImg unpack $GITHUB_WORKSPACE/tools/eMMC.burn.img burn/
           echo "::endgroup::""
 
       - name: 提取 boot 和 rootfs 分区
