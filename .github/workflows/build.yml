@@ -18,7 +18,7 @@ permissions:
 jobs:
   prepare:
     name: prepare
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       env: ${{ steps.get.outputs.env }}
 
@@ -202,11 +202,6 @@ jobs:
           - minimal
           - cli
           - desktop
-        include:
-          - TYPE: desktop
-            DESKTOP_ENVIRONMENT: xfce
-            DESKTOP_ENVIRONMENT_CONFIG_NAME: config_base
-            DESKTOP_APPGROUPS_SELECTED: ""
 
     steps:
       - name: 导入环境参数
