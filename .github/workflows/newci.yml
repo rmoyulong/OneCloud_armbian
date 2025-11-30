@@ -10,7 +10,7 @@ env:
   UBOOT_RELEASE: latest
   UBOOT_BURNIMG: eMMC.burn.img
   ARMBIAN_REPO: armbian/build
-  ARMBIAN_REF: mian
+  ARMBIAN_REF: main
 
 permissions:
   contents: write
@@ -191,7 +191,7 @@ jobs:
           # - focal # Ubuntu 20.04 LTS
           # - jammy # Ubuntu 22.04 LTS
           - noble # Ubuntu 24.04 LTS
-          #- oracular # Ubuntu 24.10
+          - oracular # Ubuntu 24.10
           - plucky # Ubuntu 25.04
           # - buster # Debian 10
           # - bullseye # Debian 11
