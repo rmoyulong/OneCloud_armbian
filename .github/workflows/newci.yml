@@ -108,7 +108,7 @@ jobs:
           body_path: Body.md
 
   build-kernel:
-    name: Build Current
+    name: 编译Current分支
     needs: prepare
     runs-on: ubuntu-latest
 
