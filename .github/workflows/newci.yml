@@ -17,14 +17,14 @@ permissions:
 
 jobs:
   prepare:
-    name: prepare
+    name: Prepare
     runs-on: ubuntu-latest
     outputs:
       env: ${{ steps.get.outputs.env }}
 
     steps:
-      - id: get
-        name: 获取项目仓库和 Armbian 信息
+      - id: 获得信息
+        name: Get repositories and Armbian information
         run: |
           sudo timedatectl set-timezone "Asia/Shanghai"
           TIME="$(curl https://api.github.com/repos/${SCRIPT_REPO}/actions/runs/${GITHUB_RUN_ID} | jq -r .created_at)"
@@ -50,7 +50,7 @@ jobs:
 
           echo "env=$(cat $GITHUB_ENV | base64 -w 0)" >>$GITHUB_OUTPUT
 
-      - name: 显示项目仓库信息
+      - name: 显示存储库信息
         run: |
           C_RESET="\e[0m"
           C_BLACK="\e[30m"
@@ -86,7 +86,7 @@ jobs:
       - name: 生成发布信息
         run: |
           cat <<EOF | sed -E 's/^  //' | tee Release.md
-            Onecloud-全版 $(date -d "$TIME" +'%Y-%m-%d %H:%M:%S %Z(%:z)')
+            全版 $(date -d "$TIME" +'%Y-%m-%d %H:%M:%S %Z(%:z)')
 
             # Sources
             Script: [${SCRIPT_REPO}@${SCRIPT_REF}](https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_REF}) ([\`${SCRIPT_SHA}\`](https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_SHA}))
@@ -99,7 +99,7 @@ jobs:
           echo "NAME=$(head --line=1 Release.md)" >>$GITHUB_ENV
           tail --line=+2 Release.md > Body.md
 
-      - name: 上传信息
+      - name: 建立版本信息
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
@@ -108,16 +108,16 @@ jobs:
           body_path: Body.md
 
   build-kernel:
-    name: 编译Current分支
+    name: Build Current
     needs: prepare
     runs-on: ubuntu-latest
 
     steps:
-      - name: 导入环境参数
+      - name: 引入环境参数
         run: |
           echo "$(echo "${{ needs.prepare.outputs.env }}" | base64 -d)" >>$GITHUB_ENV
 
-      - name: 检查服务器配置
+      - name: 检查服务器信息
         run: |
           sudo timedatectl set-timezone "Asia/Shanghai"
           echo "-------------------------------CPU信息-------------------------------------------"
@@ -136,7 +136,7 @@ jobs:
           echo "硬盘详情："
           df -Th
 
-      - name: 检查项目
+      - name: 检查
         uses: actions/checkout@main
         with:
           repository: ${{ env.ARMBIAN_REPO }}
@@ -171,7 +171,7 @@ jobs:
             $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
           EOF
 
-      - name: 上传最新版本
+      - name: 上传至发布平台
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
@@ -181,7 +181,7 @@ jobs:
             output/debs/*
 
   build:
-    name: 编译 ${{ matrix.RELEASE }}-current-${{ matrix.TYPE == 'desktop' && matrix.DESKTOP_ENVIRONMENT || matrix.TYPE }}
+    name: Build ${{ matrix.RELEASE }}-current-${{ matrix.TYPE == 'desktop' && matrix.DESKTOP_ENVIRONMENT || matrix.TYPE }}
     needs: [ prepare, build-kernel ]
     runs-on: ubuntu-latest
     strategy:
@@ -191,7 +191,7 @@ jobs:
           # - focal # Ubuntu 20.04 LTS
           # - jammy # Ubuntu 22.04 LTS
           - noble # Ubuntu 24.04 LTS
-          - oracular # Ubuntu 24.10
+          #- oracular # Ubuntu 24.10
           - plucky # Ubuntu 25.04
           # - buster # Debian 10
           # - bullseye # Debian 11
@@ -202,13 +202,18 @@ jobs:
           - minimal
           - cli
           - desktop
+        include:
+          - TYPE: desktop
+            DESKTOP_ENVIRONMENT: xfce
+            DESKTOP_ENVIRONMENT_CONFIG_NAME: config_base
+            DESKTOP_APPGROUPS_SELECTED: ""
 
     steps:
-      - name: 导入环境参数
+      - name: 引入环境参数
         run: |
           echo "$(echo "${{ needs.prepare.outputs.env }}" | base64 -d)" >>$GITHUB_ENV
 
-      - name: 检查服务器配置
+      - name: 检查服务器信息
         run: |
           echo "-------------------------------CPU信息-------------------------------------------"
           echo
@@ -233,7 +238,7 @@ jobs:
           sudo apt install android-sdk-libsparse-utils
           df -Th
 
-      - name: 检查项目
+      - name: 检查信息
         uses: actions/checkout@main
         with:
           repository: ${{ env.ARMBIAN_REPO }}
@@ -282,7 +287,7 @@ jobs:
           ./AmlImg unpack ./uboot.img burn/
           echo "::endgroup::"
 
-      - name: 提取 boot 和 rootfs 分区
+      - name: 提取引导分区和根文件系统分区
         run: |
           diskimg=$(ls output/images/*.img)
           loop=$(sudo losetup --find --show --partscan $diskimg)
@@ -291,7 +296,7 @@ jobs:
           sudo losetup -d $loop
           sudo chown $(id -u):$(id -g) -R burn/
 
-      - name: 生成刻录映像
+      - name: 生成烧录镜像
         run: |
           echo -n "sha1sum $(sha1sum burn/boot.simg | awk '{print $1}')" >burn/boot.VERIFY
           echo -n "sha1sum $(sha1sum burn/rootfs.simg | awk '{print $1}')" >burn/rootfs.VERIFY
@@ -307,7 +312,7 @@ jobs:
           burnimg=${prefix}.burn.img
           ./AmlImg pack $burnimg burn/
 
-      - name: 哈希和压缩镜像
+      - name: 镜像哈希信息和压缩
         run: |
           for f in output/images/*.img; do
             sha256sum "$f" | tee -a sha256sum
@@ -317,7 +322,7 @@ jobs:
       - name: 上传资料
         uses: actions/upload-artifact@main
         with:
-          name: ${{ matrix.RELEASE }}-可靠版-${{ matrix.TYPE == 'desktop' && matrix.DESKTOP_ENVIRONMENT || matrix.TYPE }}
+          name: ${{ matrix.RELEASE }}-current-${{ matrix.TYPE == 'desktop' && matrix.DESKTOP_ENVIRONMENT || matrix.TYPE }}
           path: output/images/*
 
       - name: 生成发布信息
@@ -326,7 +331,7 @@ jobs:
             $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
           EOF
 
-      - name: 上传最新版本
+      - name: 上传至发布平台
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
