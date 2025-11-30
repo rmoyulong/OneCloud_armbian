@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   prepare:
-    name: Prepare
+    name: 准备
     runs-on: ubuntu-latest
     outputs:
       env: ${{ steps.get.outputs.env }}
@@ -181,7 +181,7 @@ jobs:
             output/debs/*
 
   build:
-    name: Build ${{ matrix.RELEASE }}-current-${{ matrix.TYPE == 'desktop' && matrix.DESKTOP_ENVIRONMENT || matrix.TYPE }}
+    name: 编译 ${{ matrix.RELEASE }}-current-${{ matrix.TYPE == 'desktop' && matrix.DESKTOP_ENVIRONMENT || matrix.TYPE }}
     needs: [ prepare, build-kernel ]
     runs-on: ubuntu-latest
     strategy:
