@@ -23,7 +23,7 @@ jobs:
       env: ${{ steps.get.outputs.env }}
 
     steps:
-      - id: 获得信息
+      - id: get
         name: Get repositories and Armbian information
         run: |
           sudo timedatectl set-timezone "Asia/Shanghai"
