@@ -8,8 +8,8 @@ on:
         required: true
         default: "main"
         options:
-        - v26.2.1
-        - v26.2.0-trunk.682
+        - v26.8.0-trunk.121
+        - v26.5.1
         - main
         
         
@@ -46,4 +46,4 @@ jobs:
           armbian_branch:    "${{ inputs.branch_version }}"
           armbian_kernel_branch:    "current"
           armbian_ui:               "${{ matrix.TYPE }}"
-          armbian_release_tittle:   "玩客云三代(WS1608) Armbian官方镜像"
+          armbian_release_tittle:   "玩客云三代(WS1608)Armbian官方镜像"
