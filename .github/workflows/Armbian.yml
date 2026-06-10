@@ -6,10 +6,10 @@ on:
         type: choice
         description: 选择源码分支
         required: true
-        default: "main"
+        default: "v26.2.1"
         options:
-        - v26.8.0-trunk.121
         - v26.5.1
+        - v26.2.1
         - main
         
         
