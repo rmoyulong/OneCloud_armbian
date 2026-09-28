@@ -14,8 +14,8 @@ env:
   #ARMBIAN_REF: v26.2.1
   ARMBIAN_TAG: 6.12.111
 
-permissions:
-  contents: write
+#CI权限
+permissions: write-all
 
 jobs:
   prepare:
@@ -181,14 +181,16 @@ jobs:
             $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
           EOF
 
-      - name: 上传至发布平台
-        uses: softprops/action-gh-release@v2
+      - name: 生成标签，上传固件 
+        uses: ncipollo/release-action@main
         with:
-          tag_name: ${{ env.TAG }}
-          append_body: true
-          body_path: Release.md
-          files: |
-            output/debs/*
+          tag: ${{ env.TAG }}
+          artifacts: output/debs/*
+          allowUpdates: true
+          removeArtifacts: true
+          replacesArtifacts: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          bodyFile: Release.md
 
   build:
     name: 编译 ${{ matrix.RELEASE }}-current-${{ matrix.TYPE == 'desktop' && matrix.DESKTOP_ENVIRONMENT || matrix.TYPE }}
@@ -341,12 +343,14 @@ jobs:
           cat <<EOF | sed -E 's/^  //' | tee Release.md
             $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
           EOF
-
-      - name: 上传至发布平台
-        uses: softprops/action-gh-release@v2
+          
+      - name: 生成标签，上传固件 
+        uses: ncipollo/release-action@main
         with:
-          tag_name: ${{ env.TAG }}
-          append_body: true
-          body_path: Release.md
-          files: |
-            output/images/*
+          tag: ${{ env.TAG }}
+          artifacts: output/images/*
+          allowUpdates: true
+          removeArtifacts: true
+          replacesArtifacts: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          bodyFile: Release.md
