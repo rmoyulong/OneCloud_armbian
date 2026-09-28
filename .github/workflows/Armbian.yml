@@ -6,10 +6,11 @@ on:
         type: choice
         description: 选择源码分支
         required: true
-        default: "v26.2.1"
+        default: "main"
         options:
-        - v26.5.1
+        - v26.11.0-trunk.40
         - v26.2.1
+        - v25.11.1
         - main
         
         
@@ -39,11 +40,11 @@ jobs:
     steps:
       - uses: armbian/build@main
         with:
-          armbian_token:     "${{ secrets.GITHUB_TOKEN }}"  # GitHub token
-          armbian_release:   "${{ matrix.RELEASE }}"                        # userspace
+          armbian_token:    "${{ secrets.GITHUB_TOKEN }}"  # GitHub token
+          armbian_release:    "${{ matrix.RELEASE }}"                        # userspace
           armbian_target:    "build"                        # build=image, kernel=kernel
-          armbian_board:     "onecloud"                   # build target
+          armbian_board:    "onecloud"                   # build target
           armbian_branch:    "${{ inputs.branch_version }}"
           armbian_kernel_branch:    "current"
-          armbian_ui:               "${{ matrix.TYPE }}"
-          armbian_release_tittle:   "玩客云三代(WS1608)Armbian官方镜像"
+          armbian_ui:    "${{ matrix.TYPE }}"
+          armbian_release_title:    "Armbian image 玩客云三代(WS1608)官方镜像"

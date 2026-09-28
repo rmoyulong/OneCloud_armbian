@@ -10,7 +10,9 @@ env:
   UBOOT_RELEASE: latest
   UBOOT_BURNIMG: eMMC.burn.img
   ARMBIAN_REPO: armbian/build
-  ARMBIAN_REF: v26.2.1
+  ARMBIAN_REF: main
+  #ARMBIAN_REF: v26.2.1
+  ARMBIAN_TAG: 6.12.115
 
 permissions:
   contents: write
@@ -142,6 +144,14 @@ jobs:
           repository: ${{ env.ARMBIAN_REPO }}
           ref: ${{ env.ARMBIAN_SHA }}
 
+      - name: Bump meson current to ${{ env.ARMBIAN_TAG }} + fix HDMI PHY patch
+        run: |
+          sed -i 's/declare -g KERNELBRANCH="tag:v6.12.28" # frozen on this version/declare -g KERNELBRANCH="tag:v${{ env.ARMBIAN_TAG }}"/' \
+            config/sources/families/include/meson_common.inc
+          curl -fsSL -o patch/kernel/archive/meson-6.12/0052-drm-meson-Describe-the-HDMI-PHY-frequency-limits-of-.patch \
+            "https://raw.githubusercontent.com/${SCRIPT_REPO}/${SCRIPT_REF}/patch/0052-drm-meson-Describe-the-HDMI-PHY-frequency-limits-of-.patch"
+          grep -n 'KERNEL_MAJOR_MINOR\|KERNELBRANCH' config/sources/families/include/meson_common.inc || true          
+
       - name: 编译
         run: |
           sudo --preserve-env \
@@ -190,11 +200,11 @@ jobs:
         RELEASE:
           # - focal # Ubuntu 20.04 LTS
           # - jammy # Ubuntu 22.04 LTS
-          - noble # Ubuntu 24.04 LTS
+          # - noble # Ubuntu 24.04 LTS
           #- oracular # Ubuntu 24.10
           - plucky # Ubuntu 25.04
           # - buster # Debian 10
-          # - bullseye # Debian 11
+          - bullseye # Debian 11
           - bookworm # Debian 12
           - trixie # Debian 13
           #- sid # Debian unstable
@@ -236,6 +246,14 @@ jobs:
         with:
           repository: ${{ env.ARMBIAN_REPO }}
           ref: ${{ env.ARMBIAN_SHA }}
+          
+      - name: Bump meson current to ${{ env.ARMBIAN_TAG }} + fix HDMI PHY patch
+        run: |
+          sed -i 's/declare -g KERNELBRANCH="tag:v6.12.28" # frozen on this version/declare -g KERNELBRANCH="tag:v${{ env.ARMBIAN_TAG }}"/' \
+            config/sources/families/include/meson_common.inc
+          curl -fsSL -o patch/kernel/archive/meson-6.12/0052-drm-meson-Describe-the-HDMI-PHY-frequency-limits-of-.patch \
+            "https://raw.githubusercontent.com/${SCRIPT_REPO}/${SCRIPT_REF}/patch/0052-drm-meson-Describe-the-HDMI-PHY-frequency-limits-of-.patch"
+          grep -n 'KERNEL_MAJOR_MINOR\|KERNELBRANCH' config/sources/families/include/meson_common.inc || true            
 
       - name: 下载内核
         uses: actions/download-artifact@main
