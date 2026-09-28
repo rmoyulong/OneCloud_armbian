@@ -12,7 +12,7 @@ env:
   ARMBIAN_REPO: armbian/build
   ARMBIAN_REF: main
   #ARMBIAN_REF: v26.2.1
-  ARMBIAN_TAG: 6.12.115
+  ARMBIAN_TAG: 6.12.111
 
 permissions:
   contents: write
