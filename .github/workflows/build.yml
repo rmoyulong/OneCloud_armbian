@@ -1,4 +1,4 @@
-name: 稳定版
+name: 解锁官方6.12.28限制的玩客云(WS1608)armbian
 
 on:
   workflow_dispatch:
