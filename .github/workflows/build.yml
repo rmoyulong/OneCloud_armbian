@@ -30,7 +30,7 @@ jobs:
         run: |
           sudo timedatectl set-timezone "Asia/Shanghai"
           TIME="$(curl https://api.github.com/repos/${SCRIPT_REPO}/actions/runs/${GITHUB_RUN_ID} | jq -r .created_at)"
-          TAG="ci-$(date -d "$TIME" -u +'%Y%m%d-%H%M%S-%Z')"
+          TAG="WS1608-armbian-$(date -d "$TIME" -u +'%Y%m%d-%H%M%S-%Z')"
 
           SCRIPT_SHA=$(curl https://api.github.com/repos/${SCRIPT_REPO}/commits/${SCRIPT_REF} | jq -r .sha)
           UBOOT_TAG=$(curl https://api.github.com/repos/${UBOOT_REPO}/releases/${UBOOT_RELEASE} | jq -r .tag_name)
@@ -181,16 +181,13 @@ jobs:
             $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
           EOF
 
-      - name: 生成标签，上传固件 
-        uses: ncipollo/release-action@main
+      - namename: 上传文件
+        uses: softprops/action-gh-release@v2
         with:
-          tag: ${{ env.TAG }}
-          artifacts: output/debs/*
-          allowUpdates: true
-          removeArtifacts: true
-          replacesArtifacts: true
-          token: ${{ secrets.GITHUB_TOKEN }}
-          bodyFile: Release.md
+          tag_name: ${{ env.TAG }}
+          files: |
+            output/debs/*
+
 
   build:
     name: 编译 ${{ matrix.RELEASE }}-current-${{ matrix.TYPE == 'desktop' && matrix.DESKTOP_ENVIRONMENT || matrix.TYPE }}
@@ -345,12 +342,10 @@ jobs:
           EOF
           
       - name: 生成标签，上传固件 
-        uses: ncipollo/release-action@main
+        uses: softprops/action-gh-release@v2
         with:
-          tag: ${{ env.TAG }}
-          artifacts: output/images/*
-          allowUpdates: true
-          removeArtifacts: true
-          replacesArtifacts: true
-          token: ${{ secrets.GITHUB_TOKEN }}
-          bodyFile: Release.md
+          tag_name: ${{ env.TAG }}
+          append_body: true
+          body_path: Release.md
+          files: |
+            output/images/*
