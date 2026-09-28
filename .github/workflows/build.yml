@@ -181,7 +181,7 @@ jobs:
             $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
           EOF
 
-      - namename: 上传文件
+      - name: 上传文件
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
