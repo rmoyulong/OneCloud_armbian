@@ -14,8 +14,8 @@ env:
   #ARMBIAN_REF: v26.2.1
   ARMBIAN_TAG: 6.12.111
 
-#CI权限
-permissions: write-all
+permissions:
+  contents: write
 
 jobs:
   prepare:
@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       env: ${{ steps.get.outputs.env }}
-
+      
     steps:
       - id: get
         name: Get repositories and Armbian information
@@ -114,8 +114,6 @@ jobs:
     name: 编译Current分支
     needs: prepare
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
       - name: 引入环境参数
@@ -196,8 +194,6 @@ jobs:
     name: 编译 ${{ matrix.RELEASE }}-current-${{ matrix.TYPE == 'desktop' && matrix.DESKTOP_ENVIRONMENT || matrix.TYPE }}
     needs: [ prepare, build-kernel ]
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     strategy:
       fail-fast: false
       matrix:
