@@ -1,5 +1,5 @@
 # armbian-onecloud 玩客云三代(WS1608)
-[![build](https://img.shields.io/github/actions/workflow/status/rmoyulong/OneCloud_armbian/newci.yml)](https://github.com/rmoyulong/OneCloud_armbian/actions/workflows/Armbian.yml) [![downloads](https://img.shields.io/github/downloads/rmoyulong/OneCloud_armbian/total)](https://github.com/rmoyulong/OneCloud_armbian/releases) [![downloads@latest](https://img.shields.io/github/downloads/rmoyulong/OneCloud_armbian/latest/total)](https://github.com/rmoyulong/OneCloud_armbian/releases/latest)
+[![build](https://img.shields.io/github/actions/workflow/status/rmoyulong/OneCloud_armbian/build.yml)](https://github.com/rmoyulong/OneCloud_armbian/actions/workflows/Armbian.yml) [![downloads](https://img.shields.io/github/downloads/rmoyulong/OneCloud_armbian/total)](https://github.com/rmoyulong/OneCloud_armbian/releases) [![downloads@latest](https://img.shields.io/github/downloads/rmoyulong/OneCloud_armbian/latest/total)](https://github.com/rmoyulong/OneCloud_armbian/releases/latest)
 
 [README](README.md) | [中文文档](README_zh.md)
 
