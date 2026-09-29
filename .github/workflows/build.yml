@@ -215,7 +215,7 @@ jobs:
         TYPE:
           - minimal
           - cli
-          - desktop
+          # - desktop
     steps:
       - name: 引入环境参数
         run: |
