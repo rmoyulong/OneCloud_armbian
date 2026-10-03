@@ -12,7 +12,7 @@ env:
   ARMBIAN_REPO: armbian/build
   ARMBIAN_REF: main
   #ARMBIAN_REF: v26.2.1
-  ARMBIAN_TAG: 6.12.111
+  ARMBIAN_TAG: 6.12.112
 
 permissions:
   contents: write
@@ -31,7 +31,7 @@ jobs:
           sudo timedatectl set-timezone "Asia/Shanghai"
           TIME="$(curl https://api.github.com/repos/${SCRIPT_REPO}/actions/runs/${GITHUB_RUN_ID} | jq -r .created_at)"
           export OWRT_DATE=$(TZ=UTC-8 date +"%y.%m.%d_%H.%M.%S")
-          TAG="解锁版-$(TZ=UTC-8 date +"%y.%m.%d_%H.%M.%S")"
+          TAG="解锁版${{ env.ARMBIAN_TAG }}-$(TZ=UTC-8 date +"%y.%m.%d_%H.%M.%S")"
 
           SCRIPT_SHA=$(curl https://api.github.com/repos/${SCRIPT_REPO}/commits/${SCRIPT_REF} | jq -r .sha)
           UBOOT_TAG=$(curl https://api.github.com/repos/${UBOOT_REPO}/releases/${UBOOT_RELEASE} | jq -r .tag_name)
@@ -89,7 +89,7 @@ jobs:
       - name: 生成发布信息
         run: |
           cat <<EOF | sed -E 's/^  //' | tee Release.md
-            解锁版-$(TZ=UTC-8 date +"%y.%m.%d_%H.%M.%S")
+            解锁版${{ env.ARMBIAN_TAG }}-$(TZ=UTC-8 date +"%y.%m.%d_%H.%M.%S")
 
             # Sources
             Script: [${SCRIPT_REPO}@${SCRIPT_REF}](https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_REF}) ([\`${SCRIPT_SHA}\`](https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_SHA}))
