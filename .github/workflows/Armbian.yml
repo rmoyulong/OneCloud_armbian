@@ -10,12 +10,35 @@ on:
         options:
         - main
 
-env:
-  onecloud_timedate: $(TZ=UTC-8 date +"%y.%m.%d")
-  
 jobs:
+  prepare:
+    name: Prepare
+    runs-on: ubuntu-latest
+    steps:
+      - name: 获得当前的时间
+        id: time
+        uses: nanzm/get-time-action@master
+        with:
+          timeZone: Asia/Shanghai
+          format: 'YYYY-MM-DD-HH:mm:ss'
+          
+      - name: 设置变量
+        id: get
+        run: |
+           TIME=${{ steps.time.outputs.time }}
+           title_tag="Armbian 玩客云三代(WS1608)官方镜像"-${TIME}
+           export Onecloud_Time_bulid_title=${title_tag}
+           echo $Onecloud_Time_bulid_title
+           
+           echo "Onecloud_Time_bulid_title=$Onecloud_Time_bulid_title" >> $GITHUB_ENV
+           echo ${{ env.Onecloud_Time_bulid_title }}
+
+    outputs:
+      Onecloud_Time_bulid_title: ${{ steps.get.outputs.Onecloud_Time_bulid_title }}
+      
   armbian_build_core:
     name: armbian-"${{ matrix.RELEASE }}"-"${{ matrix.TYPE }}"-固件编译
+    needs: prepare
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -46,4 +69,4 @@ jobs:
           armbian_branch:    "${{ inputs.branch_version }}"
           armbian_kernel_branch:    "current"
           armbian_ui:    "${{ matrix.TYPE }}"
-          armbian_release_title:    "Armbian 玩客云三代(WS1608)官方镜像-${{ env.onecloud_timedate }}"
+          armbian_release_title:    "${{ needs.prepare.outputs.Onecloud_Time_bulid_TAG }}"
