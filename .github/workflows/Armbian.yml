@@ -20,13 +20,13 @@ jobs:
         uses: nanzm/get-time-action@master
         with:
           timeZone: Asia/Shanghai
-          format: 'YYYY-MM-DD-HH:mm:ss'
+          format: 'YYYY.MM.DD_HH.mm.ss'
           
       - name: 设置变量
         id: get
         run: |
            TIME=${{ steps.time.outputs.time }}
-           TAG="Armbian 玩客云三代(WS1608)官方镜像"-${TIME}
+           TAG="Armbian_玩客云三代(WS1608)官方镜像_${TIME}"
            export CORE_TAG=${TAG}
            echo $CORE_TAG
            
