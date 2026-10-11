@@ -26,15 +26,16 @@ jobs:
         id: get
         run: |
            TIME=${{ steps.time.outputs.time }}
-           title_tag="Armbian 玩客云三代(WS1608)官方镜像"-${TIME}
-           export Onecloud_Time_bulid_title=${title_tag}
-           echo $Onecloud_Time_bulid_title
+           TAG="Armbian 玩客云三代(WS1608)官方镜像"-${TIME}
+           export CORE_TAG=${TAG}
+           echo $CORE_TAG
            
-           echo "Onecloud_Time_bulid_title=$Onecloud_Time_bulid_title" >> $GITHUB_ENV
-           echo ${{ env.Onecloud_Time_bulid_title }}
+           echo "CORE_TAG=$CORE_TAG" >> $GITHUB_ENV
+           echo "CORE_TAG=$CORE_TAG" >> $GITHUB_OUTPUT
+           echo ${{ env.CORE_TAG }}
 
     outputs:
-      Onecloud_Time_bulid_title: ${{ steps.get.outputs.Onecloud_Time_bulid_title }}
+      CORE_TAG: ${{ steps.get.outputs.CORE_TAG }} 
       
   armbian_build_core:
     name: armbian-"${{ matrix.RELEASE }}"-"${{ matrix.TYPE }}"-固件编译
@@ -69,4 +70,4 @@ jobs:
           armbian_branch:    "${{ inputs.branch_version }}"
           armbian_kernel_branch:    "current"
           armbian_ui:    "${{ matrix.TYPE }}"
-          armbian_release_title:    "${{ needs.prepare.outputs.Onecloud_Time_bulid_TAG }}"
+          armbian_release_title:    "${{ needs.prepare.outputs.CORE_TAG }}"
