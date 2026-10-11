@@ -9,8 +9,10 @@ on:
         default: "main"
         options:
         - main
-        
-        
+
+env:
+  onecloud_timedate: $(TZ=UTC-8 date +"%y.%m.%d")
+  
 jobs:
   armbian_build_core:
     name: armbian-"${{ matrix.RELEASE }}"-"${{ matrix.TYPE }}"-固件编译
@@ -44,4 +46,4 @@ jobs:
           armbian_branch:    "${{ inputs.branch_version }}"
           armbian_kernel_branch:    "current"
           armbian_ui:    "${{ matrix.TYPE }}"
-          armbian_release_title:    "Armbian image 玩客云三代(WS1608)官方镜像"
+          armbian_release_title:    "Armbian 玩客云三代(WS1608)官方镜像-${{ env.onecloud_timedate }}"
