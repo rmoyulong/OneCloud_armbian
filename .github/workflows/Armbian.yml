@@ -6,7 +6,7 @@ on:
         type: choice
         description: 选择源码分支
         required: true
-        default: "master"
+        default: "main"
         options:
         - master
         - main
@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: 获得当前的时间
         id: time
-        uses: nanzm/get-time-action@master
+        uses: nanzm/get-time-action@main
         with:
           timeZone: Asia/Shanghai
           format: 'YYYY.MM.DD_HH.mm.ss'
@@ -62,7 +62,7 @@ jobs:
           #- xfce
           
     steps:
-      - uses: rmoyulong/armbian@master
+      - uses: rmoyulong/armbian@main
         with:
           armbian_token:    "${{ secrets.GITHUB_TOKEN }}"  # GitHub token
           armbian_release:    "${{ matrix.RELEASE }}"                        # userspace
