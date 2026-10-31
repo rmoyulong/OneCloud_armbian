@@ -61,7 +61,7 @@ jobs:
           #- xfce
           
     steps:
-      - uses: rmoyulong/build@main
+      - uses: rmoyulong/armbian@main
         with:
           armbian_token:    "${{ secrets.GITHUB_TOKEN }}"  # GitHub token
           armbian_release:    "${{ matrix.RELEASE }}"                        # userspace
