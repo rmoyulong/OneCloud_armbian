@@ -6,8 +6,9 @@ on:
         type: choice
         description: 选择源码分支
         required: true
-        default: "main"
+        default: "master"
         options:
+        - master
         - main
 
 jobs:
