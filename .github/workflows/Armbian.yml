@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: 获得当前的时间
         id: time
-        uses: nanzm/get-time-action@main
+        uses: nanzm/get-time-action@master
         with:
           timeZone: Asia/Shanghai
           format: 'YYYY.MM.DD_HH.mm.ss'
